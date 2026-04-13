@@ -103,14 +103,32 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://walkinglabs.github.io/hands-on-modern-rl/appendix_math/intro/</loc>
-    <lastmod>2026-04-12T07:31:11.514Z</lastmod>
+    <loc>https://walkinglabs.github.io/hands-on-modern-rl/appendix_math/calculus-optimization/</loc>
+    <lastmod>2026-04-13T04:11:43.722Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://walkinglabs.github.io/hands-on-modern-rl/appendix_papers/intro/</loc>
-    <lastmod>2026-04-12T15:19:39.654Z</lastmod>
+    <loc>https://walkinglabs.github.io/hands-on-modern-rl/appendix_math/information-theory/</loc>
+    <lastmod>2026-04-13T04:11:43.754Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://walkinglabs.github.io/hands-on-modern-rl/appendix_math/intro/</loc>
+    <lastmod>2026-04-13T04:08:52.227Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://walkinglabs.github.io/hands-on-modern-rl/appendix_math/linear-algebra/</loc>
+    <lastmod>2026-04-13T04:08:52.281Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://walkinglabs.github.io/hands-on-modern-rl/appendix_math/probability-statistics/</loc>
+    <lastmod>2026-04-13T04:08:52.313Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -476,13 +494,13 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter12_agentic_rl/evaluation-benchmarks/</loc>
-    <lastmod>2026-04-13T01:23:17.899Z</lastmod>
+    <lastmod>2026-04-13T03:06:16.208Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter12_agentic_rl/extended-readings/</loc>
-    <lastmod>2026-04-13T01:11:57.726Z</lastmod>
+    <lastmod>2026-04-13T04:02:11.026Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
