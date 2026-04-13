@@ -162,3 +162,15 @@ mjx-container[display='true'] {
   text-align: center;
   margin: 1em 0;
 }
+
+/* Center images and provide a sensible default max-width */
+.vp-doc p > img,
+.vp-doc figure > img,
+.vp-doc > img {
+  display: block;
+  margin: 1.5rem auto;
+  max-height: 280px; /* 限制图片最大高度 */
+  width: auto;
+  max-width: 100%;
+  border-radius: 8px;
+}
