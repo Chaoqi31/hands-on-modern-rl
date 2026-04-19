@@ -192,6 +192,6 @@ plt.show()
 
 [^1]: Williams, R. J. (1992). Simple statistical gradient-following algorithms for connectionist reinforcement learning. _Machine Learning_, 8(3-4), 229-256. [DOI](https://doi.org/10.1007/BF00992696)
 
-[^2]: Sutton, R. S., et al. (2000). Policy gradient methods for reinforcement learning with function approximation. _Advances in Neural Information Processing Systems_, 12.
+[^2]: Sutton, R. S., et al. (1999). Policy gradient methods for reinforcement learning with function approximation. _Advances in Neural Information Processing Systems_, 12.
 
 [^3]: Mnih, V., et al. (2016). Asynchronous methods for deep reinforcement learning. _International Conference on Machine Learning (ICML)_. [arXiv:1602.01783](https://arxiv.org/abs/1602.01783)

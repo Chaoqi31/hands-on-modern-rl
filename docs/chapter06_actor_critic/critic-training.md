@@ -49,7 +49,7 @@ $$L_{\text{Critic}} = \left( r + \gamma V_\phi(s') - V_\phi(s) \right)^2 = \delt
 | **方差** | 低 | 高 | 中 |
 | **自举** | 是 | 否 | 是 |
 
-实际中，Actor-Critic 几乎都用 TD 方法来训练 Critic。在更高级的实现中（如第 7 章的 GAE），MC 和 TD 会被组合使用——通过参数 $\lambda$ 在两者之间插值，获得偏差和方差的最佳平衡。
+实际中，Actor-Critic 几乎都用 TD 方法来训练 Critic。在更高级的实现中（如第 8 章的 GAE），MC 和 TD 会被组合使用——通过参数 $\lambda$ 在两者之间插值，获得偏差和方差的最佳平衡。
 
 ## Critic 训练的完整流程
 
