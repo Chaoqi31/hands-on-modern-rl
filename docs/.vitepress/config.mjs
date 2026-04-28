@@ -76,6 +76,42 @@ function mermaidConfigPlugin() {
   }
 }
 
+function normalizeBrokenDocPathPlugin() {
+  const canonicalSegments = ['appendix_math', 'linear-algebra-basics']
+
+  return {
+    name: 'normalize-broken-doc-path',
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        if (!req.url) return next()
+
+        const url = new URL(req.url, 'http://localhost')
+        if (!url.pathname.includes('appendix')) return next()
+
+        const decodedPathname = decodeURIComponent(url.pathname)
+        const normalizedDecodedPathname = decodedPathname
+          .replace(/\s+/g, '')
+          .replace(/appendix_m+ath/gi, canonicalSegments[0])
+          .replace(/linea+r-algebra-basics/gi, canonicalSegments[1])
+
+        if (normalizedDecodedPathname !== decodedPathname) {
+          const normalizedPathname = normalizedDecodedPathname
+            .split('/')
+            .map((segment) => encodeURIComponent(segment))
+            .join('/')
+          const redirectTarget = `${normalizedPathname}${url.search}`
+          res.statusCode = 302
+          res.setHeader('Location', redirectTarget)
+          res.end()
+          return
+        }
+
+        next()
+      })
+    }
+  }
+}
+
 function escapeHtml(value) {
   return value
     .replace(/&/g, '&amp;')
@@ -117,7 +153,7 @@ function renderSearchMarkdown(src) {
       continue
     }
 
-    if (!line || inFence || line.startsWith(':::') || line.startsWith('|')) {
+    if (!line || inFence || line.startsWith(':::')) {
       continue
     }
 
@@ -908,7 +944,7 @@ export default defineConfig({
       }
     },
     vite: {
-      plugins: [mermaidConfigPlugin()],
+      plugins: [mermaidConfigPlugin(), normalizeBrokenDocPathPlugin()],
       resolve: {
         alias: {
           'dayjs/plugin/advancedFormat.js':

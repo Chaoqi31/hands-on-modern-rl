@@ -200,13 +200,13 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/appendix_math/linear-algebra-basics/</loc>
-    <lastmod>2026-04-28T09:27:55.749Z</lastmod>
+    <lastmod>2026-04-28T10:03:54.933Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/appendix_math/linear-algebra-bellman/</loc>
-    <lastmod>2026-04-28T09:27:02.635Z</lastmod>
+    <lastmod>2026-04-28T09:53:06.388Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -290,7 +290,7 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter02_dpo/intro/</loc>
-    <lastmod>2026-04-28T09:21:32.203Z</lastmod>
+    <lastmod>2026-04-28T09:57:04.724Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -302,7 +302,7 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter02_dpo/principles/</loc>
-    <lastmod>2026-04-28T09:07:53.116Z</lastmod>
+    <lastmod>2026-04-28T11:05:26.468Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -344,7 +344,7 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter03_mdp/mdp/</loc>
-    <lastmod>2026-04-28T04:41:04.065Z</lastmod>
+    <lastmod>2026-04-28T11:02:58.781Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
