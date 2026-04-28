@@ -1,10 +1,15 @@
 import DefaultTheme from 'vitepress/theme'
+import 'katex/dist/katex.min.css'
+import { defineAsyncComponent } from 'vue'
 import './style.css'
 import Layout from './Layout.vue'
 import NavCard from './components/NavCard.vue'
 import NavGrid from './components/NavGrid.vue'
 import StepBar from './components/StepBar.vue'
-import Mermaid from 'vitepress-plugin-mermaid/Mermaid.vue'
+
+const Mermaid = defineAsyncComponent(
+  () => import('vitepress-plugin-mermaid/Mermaid.vue')
+)
 
 function loadFonts() {
   if (typeof document === 'undefined') return

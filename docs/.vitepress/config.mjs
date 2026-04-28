@@ -1,6 +1,6 @@
 /* global process */
 import { defineConfig } from 'vitepress'
-import { withMermaid } from 'vitepress-plugin-mermaid'
+import { MermaidMarkdown } from 'vitepress-plugin-mermaid'
 import { createRequire } from 'module'
 import fs from 'fs'
 import path from 'path'
@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url'
 
 const require = createRequire(import.meta.url)
 const markdownItFootnote = require('markdown-it-footnote')
+const katex = require('katex')
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -49,6 +50,225 @@ const { owner, repo } = parseRepository()
 const base = process.env.BASE || (isVercel ? '/' : `/${repo}/`)
 const siteUrl = process.env.SITE_URL || `https://${owner}.github.io/${repo}`
 const editLinkPattern = `https://github.com/${owner}/${repo}/edit/main/docs/:path`
+const enableLocalSearch = process.env.LOCAL_SEARCH !== '0'
+const mermaidConfig = {
+  securityLevel: 'loose',
+  startOnLoad: false
+}
+
+function mermaidConfigPlugin() {
+  const virtualModuleId = 'virtual:mermaid-config'
+  const resolvedVirtualModuleId = `\0${virtualModuleId}`
+
+  return {
+    name: 'local-mermaid-config',
+    resolveId(id) {
+      if (id === virtualModuleId) {
+        return resolvedVirtualModuleId
+      }
+    },
+    load(id) {
+      if (id === resolvedVirtualModuleId) {
+        return `export default ${JSON.stringify(mermaidConfig)}`
+      }
+    }
+  }
+}
+
+function escapeHtml(value) {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+}
+
+function slugifySearchHeading(value) {
+  return value
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036F]/g, '')
+    .replace(/[\u0000-\u001f]/g, '')
+    .replace(/[\s~`!@#$%^&*()\-_+=[\]{}|\\;:"'“”‘’<>,.?/]+/g, '-')
+    .replace(/-{2,}/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/^(\d)/, '_$1')
+    .toLowerCase()
+}
+
+function stripMarkdown(value) {
+  return value
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/[*_~>#-]/g, '')
+    .trim()
+}
+
+function renderSearchMarkdown(src) {
+  const html = []
+  const slugCounts = new Map()
+  let inFence = false
+
+  for (const rawLine of src.replace(/^---[\s\S]*?---\n/, '').split('\n')) {
+    const line = rawLine.trim()
+
+    if (line.startsWith('```')) {
+      inFence = !inFence
+      continue
+    }
+
+    if (!line || inFence || line.startsWith(':::')) {
+      continue
+    }
+
+    const heading = /^(#{1,6})\s+(.+)$/.exec(line)
+    if (heading) {
+      const level = heading[1].length
+      const title = stripMarkdown(heading[2])
+      const escapedTitle = escapeHtml(title)
+      const baseSlug = slugifySearchHeading(title)
+      const count = slugCounts.get(baseSlug) || 0
+      slugCounts.set(baseSlug, count + 1)
+      const slug = count === 0 ? baseSlug : `${baseSlug}-${count}`
+      html.push(
+        `<h${level}>${escapedTitle}<a class="header-anchor" href="#${slug}"></a></h${level}>`
+      )
+      continue
+    }
+
+    html.push(`<p>${escapeHtml(stripMarkdown(line))}</p>`)
+  }
+
+  return html.join('\n')
+}
+
+function isValidMathDelimiter(state, pos) {
+  const max = state.posMax
+  const prevChar = pos > 0 ? state.src.charCodeAt(pos - 1) : -1
+  const nextChar = pos + 1 <= max ? state.src.charCodeAt(pos + 1) : -1
+
+  return {
+    canOpen: nextChar !== 0x20 && nextChar !== 0x09,
+    canClose:
+      prevChar !== 0x20 &&
+      prevChar !== 0x09 &&
+      (nextChar < 0x30 || nextChar > 0x39)
+  }
+}
+
+function mathInline(state, silent) {
+  if (state.src[state.pos] !== '$') return false
+
+  let delimiter = isValidMathDelimiter(state, state.pos)
+  if (!delimiter.canOpen) {
+    if (!silent) state.pending += '$'
+    state.pos += 1
+    return true
+  }
+
+  const start = state.pos + 1
+  let match = start
+  while ((match = state.src.indexOf('$', match)) !== -1) {
+    let pos = match - 1
+    while (state.src[pos] === '\\') pos -= 1
+    if ((match - pos) % 2 === 1) break
+    match += 1
+  }
+
+  if (match === -1) {
+    if (!silent) state.pending += '$'
+    state.pos = start
+    return true
+  }
+
+  if (match - start === 0) {
+    if (!silent) state.pending += '$$'
+    state.pos = start + 1
+    return true
+  }
+
+  delimiter = isValidMathDelimiter(state, match)
+  if (!delimiter.canClose) {
+    if (!silent) state.pending += '$'
+    state.pos = start
+    return true
+  }
+
+  if (!silent) {
+    const token = state.push('math_inline', 'math', 0)
+    token.markup = '$'
+    token.content = state.src.slice(start, match)
+  }
+
+  state.pos = match + 1
+  return true
+}
+
+function mathBlock(state, start, end, silent) {
+  let pos = state.bMarks[start] + state.tShift[start]
+  const max = state.eMarks[start]
+
+  if (pos + 2 > max) return false
+  if (state.src.slice(pos, pos + 2) !== '$$') return false
+
+  pos += 2
+  let firstLine = state.src.slice(pos, max)
+  let lastLine = ''
+  let found = false
+  let next = start
+
+  if (silent) return true
+  if (firstLine.trim().slice(-2) === '$$') {
+    firstLine = firstLine.trim().slice(0, -2)
+    found = true
+  }
+
+  while (!found) {
+    next++
+    if (next >= end) break
+
+    pos = state.bMarks[next] + state.tShift[next]
+    const lineMax = state.eMarks[next]
+    if (pos < lineMax && state.tShift[next] < state.blkIndent) break
+
+    if (state.src.slice(pos, lineMax).trim().slice(-2) === '$$') {
+      const lastPos = state.src.slice(0, lineMax).lastIndexOf('$$')
+      lastLine = state.src.slice(pos, lastPos)
+      found = true
+    }
+  }
+
+  state.line = next + 1
+  const token = state.push('math_block', 'math', 0)
+  token.block = true
+  token.content =
+    (firstLine && firstLine.trim() ? `${firstLine}\n` : '') +
+    state.getLines(start + 1, next, state.tShift[start], true) +
+    (lastLine && lastLine.trim() ? lastLine : '')
+  token.map = [start, state.line]
+  token.markup = '$$'
+  return true
+}
+
+function renderKatex(content, displayMode) {
+  return katex.renderToString(content, {
+    displayMode,
+    output: 'htmlAndMathml',
+    throwOnError: false,
+    strict: false,
+    trust: true
+  })
+}
+
+function katexMarkdown(md) {
+  md.inline.ruler.after('escape', 'math_inline', mathInline)
+  md.block.ruler.after('blockquote', 'math_block', mathBlock, {
+    alt: ['paragraph', 'reference', 'blockquote', 'list']
+  })
+  md.renderer.rules.math_inline = (tokens, idx) =>
+    renderKatex(tokens[idx].content, false)
+  md.renderer.rules.math_block = (tokens, idx) =>
+    `<p>${renderKatex(tokens[idx].content, true)}</p>\n`
+}
 
 const zhNav = [
   { text: '前言与导论', link: '/preface/intro' },
@@ -112,7 +332,7 @@ const zhSidebar = {
           collapsed: false,
           items: [
             {
-              text: '2.1 Post-Training 与 DPO 目标',
+              text: '2.1 Post-Training 流水线与 DPO 推导',
               link: '/chapter02_dpo/principles'
             },
             {
@@ -662,8 +882,7 @@ const enSidebar = {
   ]
 }
 
-export default withMermaid(
-  defineConfig({
+export default defineConfig({
     lang: 'zh-CN',
     title: 'Hands-on Modern RL',
     description: '现代强化学习实战——从代码到原理',
@@ -671,26 +890,22 @@ export default withMermaid(
     cleanUrls: true,
     lastUpdated: true,
     markdown: {
-      math: true,
       config: (md) => {
         md.use(markdownItFootnote)
-
-        // Workaround: markdown-it-mathjax3 may inject <style> tags that
-        // Vue's DOM compiler rejects in dev mode.  Strip them from the
-        // rendered output so the page compiles cleanly.
-        const stripStyles = (html) =>
-          html.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-        const origInline = md.renderer.rules.math_inline
-        const origBlock = md.renderer.rules.math_block
-        if (origInline) {
-          md.renderer.rules.math_inline = function (...args) {
-            return stripStyles(origInline.apply(this, args))
-          }
-        }
-        if (origBlock) {
-          md.renderer.rules.math_block = function (...args) {
-            return stripStyles(origBlock.apply(this, args))
-          }
+        katexMarkdown(md)
+        MermaidMarkdown(md)
+      }
+    },
+    vite: {
+      plugins: [mermaidConfigPlugin()],
+      resolve: {
+        alias: {
+          'dayjs/plugin/advancedFormat.js':
+            'dayjs/esm/plugin/advancedFormat',
+          'dayjs/plugin/customParseFormat.js':
+            'dayjs/esm/plugin/customParseFormat',
+          'dayjs/plugin/isoWeek.js': 'dayjs/esm/plugin/isoWeek',
+          'cytoscape/dist/cytoscape.umd.js': 'cytoscape/dist/cytoscape.esm.js'
         }
       }
     },
@@ -816,9 +1031,14 @@ export default withMermaid(
       socialLinks: [
         { icon: 'github', link: `https://github.com/${owner}/${repo}` }
       ],
-      search: {
-        provider: 'local'
-      },
+      search: enableLocalSearch
+        ? {
+            provider: 'local',
+            options: {
+              _render: renderSearchMarkdown
+            }
+          }
+        : undefined,
       editLink: {
         pattern: editLinkPattern,
         text: 'Edit this page on GitHub'
@@ -832,5 +1052,4 @@ export default withMermaid(
         label: 'Outline'
       }
     }
-  })
-)
+})
