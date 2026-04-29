@@ -8,10 +8,10 @@ AlphaGo 通过自我博弈从零开始学会了下围棋——不需要人类棋
 
 自博弈（Self-Play）的核心思想极其优雅：**不依赖外部数据，让模型自己生成训练数据，并在互相对抗中寻找纳什均衡**。
 
-![Go Board](./images/alphago.jpg)
+![SPIN Pipeline](./images/spin_pipeline.png)
 
 <div style="text-align: center; font-size: 0.9em; color: var(--vp-c-text-2); margin-top: -10px; margin-bottom: 20px;">
-  <em>图 1：围棋等零和博弈是 Self-Play 诞生的温床。通过左右手互搏，AlphaGo Zero 在几天内超越了人类千年的围棋知识积累。来源：<a href="https://commons.wikimedia.org/wiki/File:Go_board_with_stones.jpg" target="_blank" rel="noopener noreferrer">Wikimedia Commons</a></em>
+  <em>图 1：UCLA 与 UIUC 联合提出的 SPIN（Self-Play Fine-Tuning）论文架构。模型在没有任何人类新增数据的情况下，通过与“过去的自己”博弈，不断将较弱的语言模型转化为更强的语言模型。来源：<a href="https://arxiv.org/abs/2401.01335" target="_blank" rel="noopener noreferrer">SPIN Paper</a></em>
 </div>
 
 具体的训练流程通常是：
@@ -89,12 +89,6 @@ Generator 试图生成"让 Judge 给高分"的回答，Judge 试图"更准确地
 
 这个过程迫使模型学会**严谨推理**——如果你的推理有漏洞，对手会抓住它并扣分；如果对手的推理有漏洞，你需要指出它来得分。这种“辩论-裁判”的机制让模型在对抗中学会了深度的长逻辑链推理。
 
-![Tic Tac Toe](./images/tic_tac_toe.svg)
-
-<div style="text-align: center; font-size: 0.9em; color: var(--vp-c-text-2); margin-top: -10px; margin-bottom: 20px;">
-  <em>图 2：辩论训练的本质是一场回合制的博弈。模型不仅要给出答案，还要像下棋一样思考对手可能的反驳，并提前做好防御。来源：<a href="https://commons.wikimedia.org/wiki/File:Tic_tac_toe.svg" target="_blank" rel="noopener noreferrer">Wikimedia Commons</a></em>
-</div>
-
 ```python
 def debate_training(question, model_a, model_b, judge, rounds=3):
     """辩论式训练：两个模型辩论，裁判评判"""
@@ -130,6 +124,12 @@ def debate_training(question, model_a, model_b, judge, rounds=3):
 自进化系统的核心是 **Online Learning（在线强化学习）**，它把这个过程变成了一个**永不停止的飞轮**：
 
 $$ \text{策略 } \pi*{\theta} \xrightarrow{\text{Self-Play 生成}} \text{新轨迹数据 } \tau \xrightarrow{\text{规则/奖励模型打分}} \text{奖励 } R \xrightarrow{\text{PPO/GRPO 更新}} \text{新策略 } \pi*{\theta'} \xrightarrow{\text{循环}} \cdots $$
+
+![DeepSeek-R1 Pipeline](./images/deepseek_r1_pipeline.png)
+
+<div style="text-align: center; font-size: 0.9em; color: var(--vp-c-text-2); margin-top: -10px; margin-bottom: 20px;">
+  <em>图 2：DeepSeek-R1 的强化学习训练流水线。不同于传统的两阶段（SFT + RL），DeepSeek-R1-Zero 证明了纯粹依赖基础模型（Base Model）和在线强化学习（Online RL），模型也能通过自我探索和规则奖励实现推理能力的跃升。来源：<a href="https://arxiv.org/abs/2501.12948" target="_blank" rel="noopener noreferrer">DeepSeek-R1 Paper</a></em>
+</div>
 
 **核心优势：突破人类上限**
 在离线 RLHF 中，模型只能在“人类已经给出的上限”内模仿。而在 Online Learning 的 Self-Play 中，模型通过自我探索，可能会发现人类从未想到的解题策略。例如在 DeepSeek-R1-Zero 中，模型完全依靠强化学习，在没有任何 SFT 冷启动的情况下，通过与规则环境的在线博弈，自己“顿悟”出了**长思维链（CoT）、自我反思、反复验证**等高级推理能力。
