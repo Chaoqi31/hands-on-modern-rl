@@ -179,6 +179,7 @@ def rejection_sampling(model, prompt, verifier, num_samples=16):
 ### 2. 对比构造偏好对
 
 对于 DPO 训练需要 (chosen, rejected) 偏好对：
+
 - **同一模型对比**：最高分 = chosen，最低分 = rejected
 - **不同模型对比**：强模型的回答 = chosen，弱模型的回答 = rejected
 - **Self-Critic 对比**：原始回答 = rejected，修订后 = chosen

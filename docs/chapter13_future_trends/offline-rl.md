@@ -1,4 +1,4 @@
-# 13.5 离线强化学习：只看录像学开车
+# 12.6 离线强化学习：只看录像学开车
 
 到目前为止，我们接触的所有 RL 算法（DQN、PPO、SAC、GRPO）都有一个共同的前提假设：**智能体可以在环境中自由交互**。CartPole 想玩多少局就玩多少局，Atari 游戏随时可以重来，LLM 的回答可以在线生成并评分。
 
@@ -194,4 +194,4 @@ DPO 面对的是 LLM 的 token 空间。虽然 token 组合也是天文数字，
 
 [^3]: Chen, L. et al. (2021). Decision Transformer: Reinforcement Learning via Sequence Modeling. _NeurIPS_.
 
-本章的最后，让我们用 PettingZoo 来做一个多智能体 RL 的动手实验——[动手：PettingZoo 多智能体](./pettingzoo)。
+本章的全部内容到这里就结束了。从第 1 章的 CartPole 到这里，你已经走过了现代 RL 的核心旅程。

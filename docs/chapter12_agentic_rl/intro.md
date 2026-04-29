@@ -322,16 +322,16 @@ DeepSeek-R1-Zero 的实验甚至表明，跳过 SFT 直接进行 RL 也能涌现
 
 2025–2026 年，围绕这个问题涌现了一批开源框架。下表列出当前最主流的几个，以及它们各自的核心思路：
 
-| 框架 | 开发方 | 一句话定位 | 多轮 Agent 原生支持 | GitHub |
-|------|--------|-----------|-------------------|--------|
-| **OpenRLHF** | 开源社区 | 代码最简洁（8k 行），算法与 Agent 执行解耦，一行代码切换单轮/多轮 | 是 | [OpenRLHF/OpenRLHF](https://github.com/OpenRLHF/OpenRLHF) |
-| **verl** | 字节跳动 / 开源社区 | 吞吐最高，训推在同一组 GPU 上动态切换，生态扩展最多 | 基础支持，社区扩展中 | [verl-project/verl](https://github.com/verl-project/verl) |
-| **slime** | 清华 / 智谱 | 训练和推理彻底拆成独立服务，MoE 模型效率最高 | 基础支持 | [THUDM/slime](https://github.com/THUDM/slime) |
-| **AReaL** | 蚂蚁 / 清华 | 全异步训练——GPU 完全不等，速度提升 2.77 倍 | 是 | [inclusionAI/AReaL](https://github.com/inclusionAI/AReaL) |
-| **ROLL** | 阿里巴巴淘天 | 推理（RLVR）+ Agent 双模式，原生 Qwen 支持 | 是 | [alibaba/ROLL](https://github.com/alibaba/ROLL) |
-| **SkyRL** | UC Berkeley | 模块化全栈——训练、Agent 编排、任务环境各自独立 | 是 | [NovaSky-AI/SkyRL](https://github.com/NovaSky-AI/SkyRL) |
-| **Relax** | 小红书 | 全模态（文本+图像+音频）异步训练 | 是 | 详见 arXiv:2604.11554 |
-| **TRL** | HuggingFace | 轻量易用，HuggingFace 生态无缝打通，但不支持大规模异步 | 单轮为主 | [huggingface/trl](https://github.com/huggingface/trl) |
+| 框架         | 开发方              | 一句话定位                                                        | 多轮 Agent 原生支持  | GitHub                                                    |
+| ------------ | ------------------- | ----------------------------------------------------------------- | -------------------- | --------------------------------------------------------- |
+| **OpenRLHF** | 开源社区            | 代码最简洁（8k 行），算法与 Agent 执行解耦，一行代码切换单轮/多轮 | 是                   | [OpenRLHF/OpenRLHF](https://github.com/OpenRLHF/OpenRLHF) |
+| **verl**     | 字节跳动 / 开源社区 | 吞吐最高，训推在同一组 GPU 上动态切换，生态扩展最多               | 基础支持，社区扩展中 | [verl-project/verl](https://github.com/verl-project/verl) |
+| **slime**    | 清华 / 智谱         | 训练和推理彻底拆成独立服务，MoE 模型效率最高                      | 基础支持             | [THUDM/slime](https://github.com/THUDM/slime)             |
+| **AReaL**    | 蚂蚁 / 清华         | 全异步训练——GPU 完全不等，速度提升 2.77 倍                        | 是                   | [inclusionAI/AReaL](https://github.com/inclusionAI/AReaL) |
+| **ROLL**     | 阿里巴巴淘天        | 推理（RLVR）+ Agent 双模式，原生 Qwen 支持                        | 是                   | [alibaba/ROLL](https://github.com/alibaba/ROLL)           |
+| **SkyRL**    | UC Berkeley         | 模块化全栈——训练、Agent 编排、任务环境各自独立                    | 是                   | [NovaSky-AI/SkyRL](https://github.com/NovaSky-AI/SkyRL)   |
+| **Relax**    | 小红书              | 全模态（文本+图像+音频）异步训练                                  | 是                   | 详见 arXiv:2604.11554                                     |
+| **TRL**      | HuggingFace         | 轻量易用，HuggingFace 生态无缝打通，但不支持大规模异步            | 单轮为主             | [huggingface/trl](https://github.com/huggingface/trl)     |
 
 这些框架的核心差异可以归结为一个取舍：**同步 vs 异步**。同步训练是"一桌吃完再上下一桌"——简单、可控、容易调试，但 GPU 利用率低。异步训练是"所有桌子同时开"——吞吐翻倍，但训练数据可能基于旧权重生成，需要额外的算法补偿。AReaL 的研究表明，异步训练可以在不损失效果的前提下将速度提升近 3 倍——但前提是你的训练已经调通了。
 
