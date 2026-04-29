@@ -84,7 +84,7 @@ Isaac Gym： GPU 物理仿真 × 4096 环境 + GPU 策略推理（全在 GPU 上
 
 **Sample Factory 极致吞吐**：异步 Actor-Learner 架构，Actor 进程持续收集轨迹，Learner 进程持续更新策略，共享内存零拷贝。Atari 上可达 100K+ fps。
 
-如果你把“并行环境”继续往上推，会很快遇到 Python 调度/进程通信的天花板。下一步通常是把系统拆成 Actor（采样）和 Learner（训练）两类进程：Actor 只负责把轨迹稳定地喂出来，Learner 只负责把 GPU 吃满。这类解耦架构的代表之一是 IMPALA。  
+如果你把“并行环境”继续往上推，会很快遇到 Python 调度/进程通信的天花板。下一步通常是把系统拆成 Actor（采样）和 Learner（训练）两类进程：Actor 只负责把轨迹稳定地喂出来，Learner 只负责把 GPU 吃满。这类解耦架构的代表之一是 IMPALA。
 
 ## 阶段三：LLM RL 采样基础设施
 
