@@ -16,6 +16,7 @@ CLAUDE.md
 !docs/chapter01_cartpole/images/cartpole-real-training-metrics.png
 !docs/appendix_industrial_training/images/*.png
 !docs/chapter13_future_trends/embodied-intelligence/model-based-rl/images/paper/*.png
+!docs/chapter13_future_trends/offline-rl/images/paper/*.png
 code/**/output/
 code/**/*.zip
 code/**/dpo_results/

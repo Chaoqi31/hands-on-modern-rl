@@ -1,8 +1,29 @@
 # 7.3 DPO 原理、数学与选型
 
-前面你跑过了 DPO 的代码，也观察了训练指标的起伏。现在先换一个看法：**不要把 DPO 第一眼看成一条在线 RL 训练流水线，而要先把它看成一道“同题二选一”的偏好题**。
+前面你已经跑过 DPO 的训练代码，也观察了 loss、accuracy、reward margin 这些指标如何变化。现在我们放慢一步，回到 DPO 要解决的原始问题：**如果手里已经有人类偏好数据，能不能不再训练 Reward Model，也不再跑一整套 PPO，就直接训练语言模型？**
 
-给同一个 prompt，数据里放了两个回答：一个是人类更喜欢的 chosen，一个是人类不喜欢的 rejected。DPO 要训练模型做的事情很朴素：**以后遇到类似问题时，让 chosen 这一类回答相对更容易被模型写出来，让 rejected 这一类回答相对更不容易出现**。
+DPO 的训练样本是一道“同题二选一”的偏好题。给定同一个 prompt，数据里有两个回答：一个是人类更喜欢的 chosen，一个是人类不喜欢的 rejected。
+
+例如 prompt 是：
+
+> 请用两句话解释为什么天空看起来是蓝色的。
+
+偏好数据可能长这样：
+
+| 回答类型 | 内容                                                                                             |
+| -------- | ------------------------------------------------------------------------------------------------ |
+| chosen   | “阳光进入大气后，短波长的蓝光更容易被空气分子散射。我们从各个方向看到这些蓝光，所以天空呈蓝色。” |
+| rejected | “因为天空本来就是蓝色的，云把其他颜色挡住了。”                                                   |
+
+DPO 要训练模型做的事情是：以后遇到类似 prompt 时，**让 chosen 这一类回答相对更容易被模型写出来，让 rejected 这一类回答相对更不容易出现**。
+
+因此，DPO 的核心问题可以写成：
+
+> **能不能把“人类更喜欢哪个回答”直接变成一个可以反向传播的训练信号？**
+
+DPO 的回答是可以。它把 RLHF 里的 KL 正则目标重新整理，把奖励差改写成 Policy 和 Reference 的概率比值，最后得到一个类似二分类的损失函数。
+
+本节沿着一条偏好样本来讲：先看 $(x,y_w,y_l)$ 分别是什么，再解释语言模型如何给整段回答计算概率，接着从 RLHF 的 KL 正则目标推出 DPO loss，最后回到手写代码和 TRL 的 `DPOTrainer`。
 
 ```mermaid
 flowchart LR
@@ -18,7 +39,7 @@ flowchart LR
     style O fill:#eef2ff,stroke:#4f46e5
 ```
 
-这里最容易误会的一点是：**DPO 不是一个新的语言模型，也不只是一个 loss。DPO 是一种离线偏好优化方法：用已经标好的偏好对，直接训练语言模型策略。**
+需要先明确一点：**DPO 不是一个新的语言模型，也不只是一个 loss。DPO 是一种离线偏好优化方法：用已经标好的偏好对，直接训练语言模型策略。**
 
 在 DPO 里，真正被训练的对象仍然是语言模型，也就是策略：
 
@@ -28,11 +49,11 @@ $$
 
 这里 $x$ 是用户输入的 prompt，$y$ 是模型生成的回答，$\theta$ 是正在更新的模型参数。注意，DPO 并没有额外发明一个“DPO 模型”。它训练的还是这一个语言模型，只是训练信号不再来自“奖励模型给几分”，而来自“人类在两个回答中选了哪一个”。
 
-它和 PPO 的第一层差异可以先这样理解：**PPO 是先让模型在线生成，再用奖励模型打分；DPO 是先拿到人类已经比较过的回答对，再把“哪个更好”变成一个可以直接反向传播的对比损失**。所以后文会频繁讲 DPO loss，但要记住：**loss 只是 DPO 落到代码里的训练信号，DPO 本身是一整套离线偏好优化方法。**
+它和 PPO 的第一层差异可以先这样理解：**PPO 是先让模型在线生成，再用奖励模型打分；DPO 是先拿到人类已经比较过的回答对，再把“哪个更好”变成一个可以直接反向传播的对比损失**。所以后文会频繁讲 DPO loss，但要注意：**loss 只是 DPO 落到代码里的训练信号，DPO 本身是一套离线偏好优化方法。**
 
 ## 先从一条偏好样本读起
 
-不要一上来就把 DPO 看成一个孤立公式。它真正聪明的地方在于：**它从 RLHF 的目标出发，但最后不按 PPO 那样在线采样更新，而是把“人类更喜欢哪个回答”改写成一个分类式训练信号**。
+DPO 的关键不在于凭空提出一个新公式，而在于：**它从 RLHF 的目标出发，但最后不按 PPO 那样在线采样更新，而是把“人类更喜欢哪个回答”改写成一个分类式训练信号**。
 
 为了看清楚这个转化，先把语言模型放进强化学习框架里：
 
@@ -70,11 +91,11 @@ DPO 的切入点不一样。DPO 论文先指出 RLHF 往往复杂且不稳定，
 - 中间是 PPO / RLHF 路径：在线生成回答，奖励模型打分，Critic 估计优势，再用 PPO-Clip 更新。
 - 右边是 DPO 路径：使用离线偏好对，借助 KL 正则目标的闭式解，把“奖励差”改写成 Policy 和 Reference 的概率比值。
 
-因此，这一节的读法和 PPO 那一节不一样：**我们会先盯住偏好三元组 $(x,y_w,y_l)$，再回到 RLHF 的 KL 正则目标，最后推导为什么一个看似复杂的 RL 问题可以落成 DPO 的分类损失**。
+因此，后面的推导会先固定偏好三元组 $(x,y_w,y_l)$，再回到 RLHF 的 KL 正则目标，最后说明为什么一个看似复杂的 RL 问题可以落成 DPO 的分类损失。
 
 > 论文脉络：PPO 来自 Schulman 等人的 [Proximal Policy Optimization Algorithms](https://arxiv.org/abs/1707.06347)。DPO 来自 Rafailov 等人的 [Direct Preference Optimization](https://arxiv.org/abs/2305.18290)。前者给出稳定在线策略更新，后者把 KL 约束的 RLHF 目标转成离线偏好优化。
 
-可以先看一份最小的手写 DPO 代码地图。后面的公式都会回到这份代码中的某几行：
+下面是一份最小的手写 DPO 代码地图。后面的公式都会回到这份代码中的某几行：
 
 <DpoCodeFocus focus="overview" />
 
@@ -95,14 +116,14 @@ DPO 的切入点不一样。DPO 论文先指出 RLHF 往往复杂且不稳定，
 
 ## 从 PPO/RLHF 改到 DPO：代码到底少了什么
 
-看到这里，可以先暂停一下。DPO 和 PPO/RLHF 的差异，不只是“换了一个 loss 名字”，而是**训练代码的输入、模型组件和更新方式都变了**。
+在继续推导公式前，先看 DPO 和 PPO/RLHF 的代码差异。这个差异不只是“换了一个 loss 名字”，而是**训练代码的输入、模型组件和更新方式都变了**。
 
 如果还沿用 PPO/RLHF 的思路，训练循环大概会像这样：
 
 ```python
 # PPO / RLHF 的训练直觉：先在线生成，再打分，再用优势更新
-responses = policy.generate(prompts)
-logps_old = policy_logprob(policy, prompts, responses).detach()
+responses = policy_old.generate(prompts)
+logps_old = policy_logprob(policy_old, prompts, responses).detach()
 
 rewards = reward_model(prompts, responses)
 values = critic(prompts, responses)
@@ -142,7 +163,7 @@ dpo_loss = -F.logsigmoid(beta * (chosen_logratio - rejected_logratio)).mean()
 把两边放在一起看，差别会更明显：
 
 ```diff
-- responses = policy.generate(prompts)
+- responses = policy_old.generate(prompts)
 - rewards = reward_model(prompts, responses)
 - values = critic(prompts, responses)
 - advantages = rewards - values
@@ -661,11 +682,19 @@ DPO 很优雅，但它不是万能的：
 | **训练复杂度**       | 低（标准监督学习）         | 高（多模型协调、超参敏感）        |
 | **上限**             | 受数据质量限制             | 理论上更高（可在线探索）          |
 
-DPO 在工程复杂度上完胜 PPO，但 PPO 在理论上限上更高。正是这个 trade-off 催生了 DPO 家族——一系列方法都在回答同一个问题：**哪个组件可以安全地去掉？**
+DPO 在工程复杂度上完胜 PPO，但 PPO 在理论上限上更高。正是这个 trade-off 催生了一类 DPO-style 离线偏好优化方法——它们都在回答同一个问题：**哪个组件可以安全地去掉？**
 
-## 7.3.4 KTO、SimPO、IPO 速览
+## 7.3.4 DPO-style 离线偏好优化家族
 
-DPO 的核心贡献是证明了"偏好对齐不一定要走 RLHF 的老路"。这个思路一旦被验证，很快就催生了一整个方法家族——它们都绕过显式 RL，但在数据要求和数学细节上各有特色。
+推完 DPO loss，也看到 DPO 的局限之后，就可以继续看一组“沿着 DPO 思路继续简化”的方法：KTO、SimPO 和 IPO。
+
+它们可以宽松地称为 **DPO-style 家族**，或者更准确地说，是**离线偏好优化家族**。它们不一定都严格使用 DPO 的同一个 loss，但共同点很清楚：都尽量绕过“训练 Reward Model + 在线 PPO 更新”这条复杂路线，直接从偏好或偏好类数据中训练策略模型。
+
+这组方法的差异可以先按“去掉了什么”来理解：
+
+- **KTO**：去掉成对比较数据，只要单个回答的好/坏反馈。
+- **SimPO**：去掉 Reference Model，只用策略模型自己的平均 log 概率。
+- **IPO**：保留偏好对和 Reference，但把 DPO 的 log-sigmoid 目标改成更稳健的平方误差目标。
 
 ### KTO：只需要点赞和踩
 
