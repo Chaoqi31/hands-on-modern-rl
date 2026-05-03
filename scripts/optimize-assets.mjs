@@ -11,6 +11,13 @@ const docsDir = path.join(rootDir, 'docs')
 const outputDir = path.join(docsDir, 'public', 'optimized')
 const mermaidSourceDir = path.join(docsDir, 'assets-sources', 'mermaid')
 const manifestPath = path.join(outputDir, 'asset-manifest.json')
+const mermaidRuntimePath = path.join(
+  rootDir,
+  'node_modules',
+  'mermaid',
+  'dist',
+  'mermaid.min.js'
+)
 
 const rasterExtensions = new Set(['.png', '.jpg', '.jpeg'])
 const gifExtensions = new Set(['.gif'])
@@ -78,6 +85,69 @@ function commandExists(command) {
   return exists
 }
 
+function commandPath(command) {
+  const result = spawnSync('command', ['-v', command], {
+    shell: true,
+    encoding: 'utf8'
+  })
+
+  if (result.status !== 0) return null
+  return result.stdout.trim().split('\n')[0] || null
+}
+
+function findBrowserExecutable() {
+  const envCandidates = [
+    process.env.PUPPETEER_EXECUTABLE_PATH,
+    process.env.CHROME_PATH
+  ].filter(Boolean)
+  const macCandidates = [
+    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    '/Applications/Chromium.app/Contents/MacOS/Chromium',
+    '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge'
+  ]
+  const pathCandidates = [
+    'chromium',
+    'chromium-browser',
+    'google-chrome',
+    'google-chrome-stable',
+    'chrome',
+    'msedge'
+  ]
+    .map(commandPath)
+    .filter(Boolean)
+
+  return [...envCandidates, ...macCandidates, ...pathCandidates].find(
+    (candidate) => fs.existsSync(candidate)
+  )
+}
+
+async function createBrowser() {
+  const executablePath = findBrowserExecutable()
+
+  if (!executablePath) {
+    return { error: 'missing Chrome or Chromium executable' }
+  }
+
+  let puppeteer
+  try {
+    puppeteer = await import('puppeteer-core')
+  } catch (error) {
+    return { error: `missing puppeteer-core: ${error.message}` }
+  }
+
+  try {
+    const browser = await puppeteer.default.launch({
+      executablePath,
+      headless: 'new',
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    })
+
+    return { browser, executablePath }
+  } catch (error) {
+    return { error: `browser launch failed: ${error.message}` }
+  }
+}
+
 function walk(dir, files = []) {
   if (!fs.existsSync(dir)) return files
 
@@ -92,7 +162,9 @@ function walk(dir, files = []) {
         relativePath === 'public' ||
         relativePath.startsWith('public/') ||
         relativePath === 'public/optimized' ||
-        relativePath.startsWith('public/optimized/')
+        relativePath.startsWith('public/optimized/') ||
+        relativePath === 'assets-sources' ||
+        relativePath.startsWith('assets-sources/')
       ) {
         continue
       }
@@ -119,6 +191,9 @@ function outputRelativeForImage(sourceRelative, extension = '.webp') {
 function optimizeRaster(sourcePath, sourceRelative) {
   const outputRelative = outputRelativeForImage(sourceRelative)
   const outputPath = path.join(outputDir, outputRelative)
+  const cached = useCachedOutput(sourcePath, outputPath, outputRelative)
+
+  if (cached) return cached
 
   if (!commandExists('cwebp')) {
     return useExistingOutput(
@@ -169,6 +244,9 @@ function optimizeRaster(sourcePath, sourceRelative) {
 function optimizeGif(sourcePath, sourceRelative) {
   const outputRelative = outputRelativeForImage(sourceRelative)
   const outputPath = path.join(outputDir, outputRelative)
+  const cached = useCachedOutput(sourcePath, outputPath, outputRelative)
+
+  if (cached) return cached
 
   if (!commandExists('gif2webp')) {
     return useExistingOutput(
@@ -227,6 +305,210 @@ function optimizeSvg(sourcePath, sourceRelative) {
 
   fs.writeFileSync(tempPath, optimized)
   return keepIfSmaller(sourcePath, tempPath, outputPath, outputRelative)
+}
+
+async function captureSvgAsWebp(page, sourcePath, outputPath) {
+  const source = fs.readFileSync(sourcePath)
+  const dataUrl = `data:image/svg+xml;base64,${source.toString('base64')}`
+  const html = `<style>body{margin:0;background:#fff}img{display:block;max-width:${options.maxWidth}px;height:auto;background:#fff}</style><img id="target" src="${dataUrl}">`
+
+  await page.setViewport({
+    width: options.maxWidth,
+    height: options.maxWidth,
+    deviceScaleFactor: 1
+  })
+  await page.setContent(html)
+  await page.waitForSelector('#target')
+
+  const box = await page.$eval('#target', (image) => {
+    const rect = image.getBoundingClientRect()
+    return {
+      width: Math.ceil(rect.width),
+      height: Math.ceil(rect.height)
+    }
+  })
+
+  if (!box.width || !box.height) {
+    throw new Error('SVG rendered with zero dimensions')
+  }
+
+  await page.setViewport({
+    width: Math.max(1, box.width),
+    height: Math.max(1, box.height),
+    deviceScaleFactor: 1
+  })
+
+  const element = await page.$('#target')
+  await element.screenshot({
+    path: outputPath,
+    type: 'webp',
+    quality: options.rasterQuality,
+    omitBackground: false
+  })
+}
+
+async function renderSvgRasters(manifest) {
+  const svgAssets = Object.entries(manifest.assets).filter(
+    ([, asset]) => asset.type === 'svg'
+  )
+
+  if (!svgAssets.length) {
+    manifest.svgRasterizer = { status: 'skipped', reason: 'no SVG assets' }
+    return
+  }
+
+  const pendingAssets = []
+  let rasterized = 0
+
+  for (const [sourceRelative, asset] of svgAssets) {
+    const outputRelative = outputRelativeForImage(sourceRelative)
+    const outputPath = path.join(outputDir, outputRelative)
+    const previous = existingManifest.assets?.[sourceRelative]
+
+    if (
+      previous?.sourceHash === asset.sourceHash &&
+      previous.rasterized === true &&
+      previous.status === 'optimized' &&
+      fs.existsSync(outputPath)
+    ) {
+      if (asset.optimizedPath) {
+        fs.rmSync(path.join(docsDir, asset.optimizedPath), { force: true })
+      }
+
+      Object.assign(asset, {
+        status: 'optimized',
+        optimized: publicPathFor(outputRelative),
+        optimizedPath: docsRelative(outputPath),
+        optimizedBytes: fileSize(outputPath),
+        savingRatio: Number(
+          (fileSize(outputPath) / asset.sourceBytes).toFixed(4)
+        ),
+        rasterized: true,
+        preserved: true
+      })
+      manifest.svgSources[sourceRelative].status = asset.status
+      manifest.svgSources[sourceRelative].optimized = asset.optimized
+      manifest.svgSources[sourceRelative].rasterized = true
+      rasterized += 1
+      continue
+    }
+
+    if (
+      previous?.sourceHash === asset.sourceHash &&
+      previous.rasterizeStatus === 'not-smaller'
+    ) {
+      Object.assign(asset, {
+        rasterizeStatus: previous.rasterizeStatus,
+        rasterizeReason: previous.rasterizeReason
+      })
+      manifest.svgSources[sourceRelative].rasterizeStatus =
+        previous.rasterizeStatus
+      manifest.svgSources[sourceRelative].rasterizeReason =
+        previous.rasterizeReason
+      continue
+    }
+
+    pendingAssets.push([sourceRelative, asset])
+  }
+
+  if (!pendingAssets.length) {
+    manifest.svgRasterizer = {
+      status: 'optimized',
+      rasterized,
+      total: svgAssets.length,
+      preserved: true
+    }
+    return
+  }
+
+  const { browser, executablePath, error } = await createBrowser()
+
+  if (error) {
+    manifest.svgRasterizer = {
+      status: 'skipped',
+      reason: error,
+      rasterized,
+      total: svgAssets.length
+    }
+    return
+  }
+
+  try {
+    const page = await browser.newPage()
+
+    for (const [sourceRelative, asset] of pendingAssets) {
+      const sourcePath = path.join(docsDir, sourceRelative)
+      const outputRelative = outputRelativeForImage(sourceRelative)
+      const outputPath = path.join(outputDir, outputRelative)
+      const tempPath = path.join(
+        os.tmpdir(),
+        `homrl-${sha256(sourcePath).slice(0, 12)}.webp`
+      )
+
+      try {
+        await captureSvgAsWebp(page, sourcePath, tempPath)
+
+        if (!fs.existsSync(tempPath)) {
+          throw new Error('SVG rasterizer did not produce an output file')
+        }
+
+        const currentBestBytes = asset.optimizedBytes || asset.sourceBytes
+        const rasterBytes = fileSize(tempPath)
+
+        if (
+          rasterBytes < Math.round(currentBestBytes * options.minSavingRatio)
+        ) {
+          ensureDir(outputPath)
+          fs.copyFileSync(tempPath, outputPath)
+
+          if (asset.optimizedPath) {
+            fs.rmSync(path.join(docsDir, asset.optimizedPath), { force: true })
+          }
+
+          Object.assign(asset, {
+            status: 'optimized',
+            optimized: publicPathFor(outputRelative),
+            optimizedPath: docsRelative(outputPath),
+            optimizedBytes: rasterBytes,
+            savingRatio: Number((rasterBytes / asset.sourceBytes).toFixed(4)),
+            rasterized: true
+          })
+          manifest.svgSources[sourceRelative].status = asset.status
+          manifest.svgSources[sourceRelative].optimized = asset.optimized
+          manifest.svgSources[sourceRelative].rasterized = true
+          rasterized += 1
+        } else {
+          Object.assign(asset, {
+            rasterizeStatus: 'not-smaller',
+            rasterizeReason: 'rasterized WebP was not smaller'
+          })
+          manifest.svgSources[sourceRelative].rasterizeStatus =
+            asset.rasterizeStatus
+          manifest.svgSources[sourceRelative].rasterizeReason =
+            asset.rasterizeReason
+        }
+
+        fs.rmSync(tempPath, { force: true })
+      } catch (error) {
+        Object.assign(asset, {
+          rasterizeStatus: 'failed',
+          rasterizeReason: error.message
+        })
+        manifest.svgSources[sourceRelative].rasterizeStatus =
+          asset.rasterizeStatus
+        manifest.svgSources[sourceRelative].rasterizeReason = error.message
+      }
+    }
+
+    manifest.svgRasterizer = {
+      status: 'optimized',
+      rasterized,
+      total: svgAssets.length,
+      executablePath
+    }
+  } finally {
+    await browser.close()
+  }
 }
 
 function keepIfSmaller(sourcePath, tempPath, outputPath, outputRelative) {
@@ -309,6 +591,50 @@ function useExistingOutput(sourcePath, outputPath, outputRelative, reason) {
   }
 }
 
+function useCachedOutput(sourcePath, outputPath, outputRelative) {
+  const sourceRelative = docsRelative(sourcePath)
+  const previous = existingManifest.assets?.[sourceRelative]
+
+  if (!previous || previous.sourceHash !== hashFile(sourcePath)) return null
+
+  const previousOutputPath = previous.optimizedPath
+    ? path.join(docsDir, previous.optimizedPath)
+    : outputPath
+
+  if (
+    previous.status === 'optimized' &&
+    previous.optimizedPath &&
+    fs.existsSync(previousOutputPath)
+  ) {
+    const sourceBytes = fileSize(sourcePath)
+    const optimizedBytes = fileSize(previousOutputPath)
+
+    return {
+      status: 'optimized',
+      optimized: previous.optimized || publicPathFor(outputRelative),
+      optimizedPath: docsRelative(previousOutputPath),
+      sourceBytes,
+      optimizedBytes,
+      savingRatio: Number((optimizedBytes / sourceBytes).toFixed(4)),
+      preserved: true
+    }
+  }
+
+  if (
+    previous.status === 'skipped' &&
+    previous.reason === 'optimized file was not smaller'
+  ) {
+    return {
+      status: 'skipped',
+      reason: previous.reason,
+      sourceBytes: fileSize(sourcePath),
+      optimizedBytes: previous.optimizedBytes
+    }
+  }
+
+  return null
+}
+
 function collectImages() {
   return walk(docsDir).filter((filePath) =>
     imageExtensions.has(path.extname(filePath).toLowerCase())
@@ -351,27 +677,193 @@ function extractMermaidBlocks(markdownPath) {
   return blocks
 }
 
+function outputRelativeForMermaid(block) {
+  return `mermaid/${block.source
+    .replace(/^assets-sources\/mermaid\//, '')
+    .replace(/\.mmd$/, '.svg')}`
+}
+
+function buildExistingMermaidMap() {
+  return new Map(
+    (existingManifest.mermaid || []).map((block) => [block.id, block])
+  )
+}
+
+async function renderMermaidBlocks(manifest) {
+  const blocks = manifest.mermaid
+  const existingMermaid = buildExistingMermaidMap()
+
+  if (!blocks.length) {
+    manifest.mermaidRenderer = { status: 'skipped', reason: 'no blocks' }
+    return
+  }
+
+  let rendered = 0
+  const pendingBlocks = []
+
+  for (const block of blocks) {
+    const outputRelative = outputRelativeForMermaid(block)
+    const outputPath = path.join(outputDir, outputRelative)
+    const previous = existingMermaid.get(block.id)
+
+    if (
+      previous?.hash === block.hash &&
+      previous.status === 'optimized' &&
+      fs.existsSync(outputPath)
+    ) {
+      Object.assign(block, {
+        status: 'optimized',
+        type: 'mermaid-svg',
+        optimized: previous.optimized,
+        optimizedPath: previous.optimizedPath,
+        sourceBytes: previous.sourceBytes,
+        optimizedBytes: fileSize(outputPath),
+        preserved: true
+      })
+      rendered += 1
+      continue
+    }
+
+    pendingBlocks.push(block)
+  }
+
+  if (!pendingBlocks.length) {
+    manifest.mermaidRenderer = {
+      status: 'optimized',
+      rendered,
+      total: blocks.length,
+      preserved: true
+    }
+    return
+  }
+
+  if (process.env.SKIP_MERMAID_RENDER === '1') {
+    manifest.mermaidRenderer = {
+      status: 'skipped',
+      reason: 'SKIP_MERMAID_RENDER=1'
+    }
+    return
+  }
+
+  const executablePath = findBrowserExecutable()
+
+  if (!executablePath || !fs.existsSync(mermaidRuntimePath)) {
+    manifest.mermaidRenderer = {
+      status: 'skipped',
+      reason: !executablePath
+        ? 'missing Chrome or Chromium executable'
+        : 'missing mermaid runtime'
+    }
+    return
+  }
+
+  let puppeteer
+  try {
+    puppeteer = await import('puppeteer-core')
+  } catch (error) {
+    manifest.mermaidRenderer = {
+      status: 'skipped',
+      reason: `missing puppeteer-core: ${error.message}`
+    }
+    return
+  }
+
+  let browser
+  try {
+    browser = await puppeteer.default.launch({
+      executablePath,
+      headless: 'new',
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    })
+    const page = await browser.newPage()
+    await page.addScriptTag({ path: mermaidRuntimePath })
+    await page.evaluate(() => {
+      window.mermaid.initialize({
+        securityLevel: 'loose',
+        startOnLoad: false,
+        theme: 'default'
+      })
+    })
+
+    for (const block of pendingBlocks) {
+      const outputRelative = outputRelativeForMermaid(block)
+      const outputPath = path.join(outputDir, outputRelative)
+      const sourcePath = path.join(docsDir, block.source)
+      const source = fs.readFileSync(sourcePath, 'utf8')
+
+      try {
+        const svg = await page.evaluate(
+          async ({ id, graph }) => {
+            const result = await window.mermaid.render(id, graph)
+            return result.svg
+          },
+          {
+            id: `mermaid-${block.id}`,
+            graph: source
+          }
+        )
+
+        ensureDir(outputPath)
+        fs.writeFileSync(outputPath, `${svg.trim()}\n`)
+        Object.assign(block, {
+          status: 'optimized',
+          type: 'mermaid-svg',
+          optimized: publicPathFor(outputRelative),
+          optimizedPath: docsRelative(outputPath),
+          sourceBytes: Buffer.byteLength(source),
+          optimizedBytes: fileSize(outputPath)
+        })
+        rendered += 1
+      } catch (error) {
+        Object.assign(block, {
+          status: 'source-only',
+          reason: `Mermaid render failed: ${error.message}`
+        })
+      }
+    }
+
+    manifest.mermaidRenderer = {
+      status: 'optimized',
+      rendered,
+      total: blocks.length,
+      executablePath
+    }
+  } catch (error) {
+    manifest.mermaidRenderer = {
+      status: 'skipped',
+      reason: `browser launch failed: ${error.message}`
+    }
+  } finally {
+    if (browser) await browser.close()
+  }
+}
+
 function writeAssetsReadme(manifest) {
-  const readmePath = path.join(docsDir, 'assets-sources', 'README.md')
+  const readmePath = path.join(docsDir, 'assets-sources', 'README.txt')
   const optimizedCount = Object.values(manifest.assets).filter(
     (asset) => asset.status === 'optimized'
   ).length
   const svgCount = Object.keys(manifest.svgSources).length
+  const mermaidRenderedCount = manifest.mermaid.filter(
+    (block) => block.status === 'optimized'
+  ).length
 
   const body = `# Asset Sources
 
-This directory stores editable source-side records for generated course media.
+This directory stores generated source-side records for course media.
 
 - Original raster and SVG files remain in their chapter folders under \`docs/\`.
 - Optimized files for GitHub Pages live under \`docs/public/optimized/\`.
 - \`docs/public/optimized/asset-manifest.json\` maps each source file to its optimized derivative.
-- Mermaid blocks are extracted to \`docs/assets-sources/mermaid/\` so they can be edited or rendered offline later.
+- Mermaid blocks are extracted to \`docs/assets-sources/mermaid/\` for lookup and offline rendering. Edit the original Markdown block when changing a diagram.
+- Rendered Mermaid SVG files live under \`docs/public/optimized/mermaid/\` when Chrome or Chromium is available.
 
 Current manifest summary:
 
 - Optimized image derivatives: ${optimizedCount}
 - SVG source records: ${svgCount}
 - Mermaid source records: ${manifest.mermaid.length}
+- Rendered Mermaid SVG derivatives: ${mermaidRenderedCount}
 
 Run \`npm run assets:optimize\` after adding or changing course images.
 `
@@ -380,7 +872,7 @@ Run \`npm run assets:optimize\` after adding or changing course images.
   fs.writeFileSync(readmePath, body)
 }
 
-function main() {
+async function main() {
   fs.mkdirSync(outputDir, { recursive: true })
 
   const manifest = {
@@ -439,14 +931,18 @@ function main() {
         type: 'svg',
         status: optimizedSvg.status,
         optimized: optimizedSvg.optimized,
-        note: 'Editable SVG source is kept in place. The optimized derivative is a minified SVG; add a rasterizer such as sharp, rsvg-convert, or ImageMagick if WebP/PNG derivatives are desired later.'
+        note: 'Editable SVG source is kept in place. The optimized derivative is a WebP raster when Chrome or Chromium is available and the raster is smaller; otherwise it falls back to a minified SVG.'
       }
     }
   }
 
+  await renderSvgRasters(manifest)
+
   for (const markdownPath of collectMarkdownFiles()) {
     manifest.mermaid.push(...extractMermaidBlocks(markdownPath))
   }
+
+  await renderMermaidBlocks(manifest)
 
   fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`)
   writeAssetsReadme(manifest)
@@ -459,8 +955,16 @@ function main() {
   console.log(
     `Optimized ${optimizedCount} images, skipped ${skippedCount}, indexed ${
       Object.keys(manifest.svgSources).length
-    } SVGs and ${manifest.mermaid.length} Mermaid blocks.`
+    } SVGs and ${manifest.mermaid.length} Mermaid blocks${
+      manifest.svgRasterizer?.rasterized
+        ? `, rasterized ${manifest.svgRasterizer.rasterized} SVGs`
+        : ''
+    }${
+      manifest.mermaidRenderer?.rendered
+        ? `, rendered ${manifest.mermaidRenderer.rendered} Mermaid SVGs`
+        : ''
+    }.`
   )
 }
 
-main()
+await main()

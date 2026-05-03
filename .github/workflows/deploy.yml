@@ -36,13 +36,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install image optimization tools
+      - name: Install image rendering tools
         run: sudo apt-get update && sudo apt-get install -y webp
+
+      - name: Setup Chrome for static diagram rendering
+        id: setup-chrome
+        uses: browser-actions/setup-chrome@v1
 
       - name: Build with VitePress
         run: npm run build
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
+          PUPPETEER_EXECUTABLE_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

@@ -35,6 +35,7 @@
     "eslint": "^9.0.0",
     "eslint-plugin-vue": "^9.30.0",
     "prettier": "^3.7.4",
+    "puppeteer-core": "^24.42.0",
     "vue-eslint-parser": "^9.4.3"
   },
   "dependencies": {

@@ -235,12 +235,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://walkinglabs.github.io/hands-on-modern-rl/assets-sources/README/</loc>
-    <lastmod>2026-05-02T17:25:21.365Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter01_cartpole/intro/</loc>
     <lastmod>2026-05-01T06:46:41.648Z</lastmod>
     <changefreq>weekly</changefreq>
@@ -248,7 +242,7 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter01_cartpole/metrics/</loc>
-    <lastmod>2026-05-02T01:30:07.092Z</lastmod>
+    <lastmod>2026-05-03T03:06:26.729Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -602,7 +596,7 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter09_grpo_rlvr/on-policy-distillation/</loc>
-    <lastmod>2026-05-02T12:17:22.078Z</lastmod>
+    <lastmod>2026-05-03T06:10:40.426Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -776,7 +770,7 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/preface/intro/</loc>
-    <lastmod>2026-05-02T13:30:23.216Z</lastmod>
+    <lastmod>2026-05-03T11:01:11.912Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
