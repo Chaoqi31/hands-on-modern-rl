@@ -78,7 +78,7 @@ $$R_{\text{total}} = \sum_{t=1}^{T} \gamma^t \cdot r_t$$
 
 ### ORM：只看结果（Outcome Reward Model）
 
-ORM 的思路极其简单粗暴——**不给中间步骤打分，只看最终结果**[^lightman]。整条轨迹如果成功，所有步骤都得到正向信号；如果失败，所有步骤都得到负向信号。
+ORM 的思路极其简单粗暴——**不给中间步骤打分，只看最终结果 **[^lightman]。整条轨迹如果成功，所有步骤都得到正向信号；如果失败，所有步骤都得到负向信号。
 
 $$r_1 = r_2 = \cdots = r_{T-1} = 0, \quad r_T = \begin{cases} 1 & \text{成功} \\ 0 & \text{失败} \end{cases}$$
 

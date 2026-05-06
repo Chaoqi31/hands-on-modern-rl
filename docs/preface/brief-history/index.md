@@ -15,7 +15,7 @@
   <em>图 1：桑代克设计的迷笼（Puzzle Box）。来源：<a href="https://commons.wikimedia.org/wiki/File:Original_%22Puzzle_Box%22_Apparatus_Design.png" target="_blank" rel="noopener noreferrer">Wikimedia Commons</a></em>
 </div>
 
-半个多世纪后，随着控制论的兴起，这种生物本能开始被严谨地数学化。1957 年，理查德·贝尔曼（Richard Bellman）提出了**马尔可夫决策过程（MDP）**与**贝尔曼方程（Bellman Equation）** [^1]。他用一个五元组 $\langle \mathcal{S}, \mathcal{A}, P, R, \gamma \rangle$ 将现实中的序列决策问题抽象为一个精确的数学对象——状态集 $\mathcal{S}$、动作集 $\mathcal{A}$、转移概率 $P(s'|s,a)$、奖励函数 $R(s,a)$ 和折扣因子 $\gamma$。在这个框架下，智能体的目标是找到一个策略 $\pi(a|s)$，使得长期累积折扣奖励的期望最大化：
+半个多世纪后，随着控制论的兴起，这种生物本能开始被严谨地数学化。1957 年，理查德·贝尔曼（Richard Bellman）提出了**马尔可夫决策过程（MDP）** 与**贝尔曼方程（Bellman Equation）** [^1]。他用一个五元组 $\langle \mathcal{S}, \mathcal{A}, P, R, \gamma \rangle$ 将现实中的序列决策问题抽象为一个精确的数学对象——状态集 $\mathcal{S}$、动作集 $\mathcal{A}$、转移概率 $P(s'|s,a)$、奖励函数 $R(s,a)$ 和折扣因子 $\gamma$。在这个框架下，智能体的目标是找到一个策略 $\pi(a|s)$，使得长期累积折扣奖励的期望最大化：
 
 $$G_t = \sum_{k=0}^{\infty} \gamma^k R_{t+k+1}$$
 
@@ -83,7 +83,7 @@ $$\mathcal{L}^{\text{CLIP}}(\theta) = \mathbb{E}_t \left[ \min \left( \frac{\pi_
 
 ## 4. 大模型时代：对齐与推理的新范式（2020s 至今）
 
-就在人们以为 RL 的应用边界主要局限于游戏和机器人控制时，大语言模型（LLM）的崛起为 RL 赋予了全新的使命——**对齐（Alignment）**与**推理（Reasoning）**。
+就在人们以为 RL 的应用边界主要局限于游戏和机器人控制时，大语言模型（LLM）的崛起为 RL 赋予了全新的使命——**对齐（Alignment）** 与**推理（Reasoning）**。
 
 - **2022 年**，OpenAI 发布了 ChatGPT。其背后的核心功臣正是 **RLHF（基于人类反馈的强化学习）** [^9]。通过训练一个奖励模型来模拟人类偏好，再用 PPO 算法优化语言模型，RL 成功地让 LLM 从"能接话的统计机器"变成了"懂分寸的智能助手"。RLHF 的训练分两步：首先用人类偏好数据训练一个奖励模型 $r_\phi(x, y)$，然后以它为奖励信号，用 PPO 优化语言模型策略 $\pi_\theta$：
 
@@ -115,7 +115,7 @@ $$\mathcal{L}_{\text{GRPO}}(\theta) = \mathbb{E}_q \left[ \frac{1}{G} \sum_{i=1}
 
 ## 小结
 
-从桑代克的迷笼，到贝尔曼的方程；从雅达利游戏机里的 DQN，到今天云端集群里飞速迭代的 DPO 和 GRPO。强化学习的历史，就是一部智能体**"从环境中学习、从反馈中进化、从单机走向超级模型"**的史诗。
+从桑代克的迷笼，到贝尔曼的方程；从雅达利游戏机里的 DQN，到今天云端集群里飞速迭代的 DPO 和 GRPO。强化学习的历史，就是一部智能体 **"从环境中学习、从反馈中进化、从单机走向超级模型"**的史诗。
 
 今天，强化学习已经不再是象牙塔里的理论玩具，它是通向通用人工智能（AGI）的必经之路。在接下来的章节中，我们将沿着这段历史的脉络，从第一行代码开始，亲手将这些伟大的算法实现出来。
 
