@@ -1,24 +1,31 @@
 # 7.4 GAE、奖励模型与 LLM 对齐
 
-上一节我们拆解了 PPO 的裁剪机制——一条用"裁剪"代替"KL 散度"的工程智慧。但 PPO 的目标函数里还有一个关键输入我们没展开：**优势函数 $A_t$**。怎么准确估计"这个动作比平均好了多少"？这就是 GAE（Generalized Advantage Estimation）要解决的问题。而在 LLM 场景下，PPO 还需要另一个更沉重的东西——**奖励模型（Reward Model）**。这一节我们把它们一起讲清楚。
+上一节我们拆解了 PPO 的裁剪机制——一条用"裁剪"代替"KL 散度"的工程智慧（回顾：[信任域与裁剪](./trust-region-clipping)）。但 PPO 的目标函数里还有一个关键输入我们没展开：**优势函数 $A_t$**。怎么准确估计"这个动作比平均好了多少"？这就是 GAE（Generalized Advantage Estimation）要解决的问题。而在 LLM 场景下，PPO 还需要另一个更沉重的东西——**奖励模型（Reward Model）**。这一节我们把它们一起讲清楚。
+
+::: tip 本节前置知识
+- [优势函数 $A(s,a) = Q - V$](../chapter06_actor_critic/advantage-function)——GAE 要估计的对象
+- [TD Error $\delta = r + \gamma V(s') - V(s)$](../chapter06_actor_critic/critic-training)——GAE 的基本构建块
+- [DP/MC/TD 三种方法](../chapter03_mdp/dp-mc-td)——GAE 是 TD 和 MC 的插值
+- [奖励函数设计](../chapter03_mdp/reward-design)——RM 的设计思路与第 3 章的奖励塑形一脉相承
+:::
 
 ## 优势估计的困境：TD vs MC
 
-优势函数的定义是：
+优势函数的定义是（回顾：[第 6.1 节](../chapter06_actor_critic/advantage-function)）：
 
 $$A(s_t, a_t) = Q(s_t, a_t) - V(s_t)$$
 
 意思是"在这个状态下选择这个动作，比按策略的平均水平好了多少"。问题在于，$Q(s_t, a_t)$ 是未知的——我们没法精确知道"做了这个动作之后，未来到底能拿多少分"。我们只能估计。
 
-有两种经典的估计方法，各有各的问题：
+有两种经典的估计方法，各有各的问题（回顾：[第 3 章的 DP/MC/TD 对比](../chapter03_mdp/dp-mc-td)）：
 
-**时序差分（TD）估计**：只用一步的奖励来估计
+**时序差分（TD）估计**（回顾：[TD 方法](../chapter06_actor_critic/critic-training)）：只用一步的奖励来估计
 
 $$A_t^{\text{TD}} = r_t + \gamma V(s_{t+1}) - V(s_t) = \delta_t$$
 
 TD 只看一步——"刚才那一步比预期好了多少"。它的优点是方差低（只涉及一步的随机性），但偏差高——如果 Critic 的 $V(s_{t+1})$ 估计不准，误差会传播回来。这就像你用一把不准的尺子去量东西，虽然每次量的结果很稳定，但可能有系统偏差。
 
-**蒙特卡洛（MC）估计**：跑完整个 episode 再回头看
+**蒙特卡洛（MC）估计**（回顾：[MC 方法](../chapter03_mdp/dp-mc-td)）：跑完整个 episode 再回头看
 
 $$A_t^{\text{MC}} = G_t - V(s_t) = \sum_{k=0}^{\infty} \gamma^k r_{t+k} - V(s_t)$$
 
@@ -117,7 +124,7 @@ print("目标回报:", returns)
 LLM 对齐存在两条截然不同的强化路径：
 
 - **主观对齐**（如礼貌、安全、无害）：没有客观对错标准，必须通过人类偏好训练 RM
-- **客观推理**（如数学、代码）：有明确规则校验，可以直接用规则奖励（后面第 8 章会详细讲）
+- **客观推理**（如数学、代码）：有明确规则校验，可以直接用规则奖励（[第 9 章 RLVR](../chapter09_grpo_rlvr/rlvr)会详细讲）
 
 本章聚焦主观对齐场景——这也是 PPO 在 LLM 对齐中最经典的应用。
 
@@ -250,4 +257,4 @@ RM 在训练集上表现完美可能意味着**过拟合**。过拟合的 RM 会
 
 </details>
 
-**RM 是 PPO 在 LLM 对齐中最沉重的负担——训练它需要大量标注，维护它需要大量显存，信任它需要冒 reward hacking 的风险。能不能跳过这一步？** 下一章我们就会看到，DPO 给出了一个漂亮的答案——[第 8 章：DPO——绕过奖励模型的魔法](../chapter09_alignment/intro)。
+**RM 是 PPO 在 LLM 对齐中最沉重的负担——训练它需要大量标注，维护它需要大量显存，信任它需要冒 reward hacking 的风险。能不能跳过这一步？** 下一章我们就会看到，DPO 给出了一个漂亮的答案——[第 9 章：DPO——绕过奖励模型的魔法](../chapter09_alignment/intro)。

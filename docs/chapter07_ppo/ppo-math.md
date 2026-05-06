@@ -2,6 +2,16 @@
 
 上一节我们用 SB3 的 PPO 训练了月球着陆器，看到了 reward、entropy、clip fraction 这些曲线。接下来要回答一个更基础的问题：**PPO 到底是什么？为什么它最后会写成一个 loss？**
 
+::: tip 本节前置知识
+本节是对第 5-6 章内容的整合与延伸，以下概念会在推导中反复出现：
+
+- [策略目标 $J(\theta)$](../chapter03_mdp/policy-objective)——PPO 要最大化的对象
+- [策略梯度定理](../chapter05_policy_gradient/policy-gradient)——PPO 的推导起点
+- [优势函数 $A(s,a)$](../chapter06_actor_critic/advantage-function)——替代 $G_t$ 的低方差信号
+- [Critic 训练](../chapter06_actor_critic/critic-training)——价值函数损失的理论来源
+- [折扣累积回报 $G_t$](../chapter03_mdp/mdp)——从单步奖励到长期目标
+:::
+
 PPO 的全称是 **Proximal Policy Optimization**，通常翻译成**近端策略优化**。这个名字可以拆开理解：
 
 - **Policy**：策略，也就是负责选动作的模型。
@@ -128,19 +138,19 @@ flowchart LR
 
 这里的 $t$ 表示时间步。$s_t$ 是 agent 在第 $t$ 步看到的状态，$a_t$ 是它采取的动作，$r_t$ 是环境对这个动作的即时反馈。**强化学习不是只看某一步奖励，而是关心一串决策共同造成的长期结果。**
 
-通常我们把环境写成一个马尔可夫决策过程：
+通常我们把环境写成一个[马尔可夫决策过程（MDP）](../chapter03_mdp/mdp)：
 
 $$
 \mathcal{M} = (\mathcal{S}, \mathcal{A}, P, R, \gamma)
 $$
 
-每个字母的意思是：
+每个字母的意思是（回顾：[MDP 五元组](../chapter03_mdp/mdp)）：
 
 - $\mathcal{S}$：状态空间，所有可能状态的集合。
 - $\mathcal{A}$：动作空间，所有可能动作的集合。
 - $P(s_{t+1}\mid s_t,a_t)$：状态转移概率。它表示在状态 $s_t$ 执行动作 $a_t$ 后，环境转移到 $s_{t+1}$ 的概率。
 - $R(s_t,a_t)$：奖励函数。它告诉我们这一步动作带来的即时收益。
-- $\gamma$：折扣因子。它决定未来奖励在今天看来有多重要。
+- $\gamma$：[折扣因子](../chapter03_mdp/mdp)。它决定未来奖励在今天看来有多重要。
 
 **策略是我们要训练的对象。** 写成公式就是：
 
@@ -331,9 +341,9 @@ optimizer.step()
 
 ## 第四步：价值函数、基线与优势
 
-朴素 REINFORCE 能工作，但**方差很大**。原因是 $G_t$ 只是告诉我们“这次后面总共拿了多少奖励”，却没有告诉我们“这在当前状态下算不算好”。
+朴素 REINFORCE 能工作，但**方差很大**（回顾：[REINFORCE 的致命缺陷](../chapter05_policy_gradient/policy-gradient)）。原因是 $G_t$ 只是告诉我们”这次后面总共拿了多少奖励”，却没有告诉我们”这在当前状态下算不算好”。
 
-例如 LunarLander 某一步之后拿到 $G_t=80$。这听起来不错，但如果同一个状态下正常策略平均能拿 $120$，那这个动作其实低于平均水平。我们需要一个参照物，这个参照物就是状态价值函数：
+例如 LunarLander 某一步之后拿到 $G_t=80$。这听起来不错，但如果同一个状态下正常策略平均能拿 $120$，那这个动作其实低于平均水平。我们需要一个参照物，这个参照物就是[状态价值函数](../chapter03_mdp/bellman-equation)：
 
 $$
 V^\pi(s_t)
@@ -342,7 +352,7 @@ $$
 
 $V^\pi(s_t)$ 表示：如果现在处在状态 $s_t$，之后继续按照策略 $\pi$ 行动，平均能拿到多少回报。
 
-动作价值函数则多固定了一个动作：
+[动作价值函数](../chapter03_mdp/value-q)则多固定了一个动作：
 
 $$
 Q^\pi(s_t,a_t)
@@ -351,7 +361,7 @@ $$
 
 $Q^\pi(s_t,a_t)$ 表示：在状态 $s_t$ 先执行动作 $a_t$，后面再按策略 $\pi$ 行动，平均能拿到多少回报。
 
-两者相减得到优势函数：
+两者相减得到[优势函数](../chapter06_actor_critic/advantage-function)：
 
 $$
 A^\pi(s_t,a_t)
@@ -374,7 +384,7 @@ $$
 
 如果不用 GAE，最朴素的近似就是 `advantages = returns - values`。本章代码使用 GAE 来算 `advantages`，下一节会专门推导 GAE。这里先把它理解成“比 Critic 预期更好或更差的那部分”。
 
-为什么可以把 $G_t$ 换成 $A_t$？因为从策略梯度里减去一个只依赖状态的基线 $b(s_t)$，不会改变期望梯度：
+为什么可以把 $G_t$ 换成 $A_t$？因为从策略梯度里减去一个只依赖状态的基线 $b(s_t)$，不会改变期望梯度（回顾：[基线实验](../chapter05_policy_gradient/baseline-experiment)的数学解释）：
 
 $$
 \mathbb{E}_{a_t\sim\pi_\theta}
