@@ -4,6 +4,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const __filename = fileURLToPath(import.meta.url)
 const rootDir = path.resolve(path.dirname(__filename), '..')
+const mermaidFontFamily =
+  '"Noto Sans CJK SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Arial Unicode MS", sans-serif'
 
 function findBrowserExecutable() {
   const candidates = [
@@ -57,6 +59,25 @@ function extractSvgSize(svg) {
     width: Math.max(320, Math.round(rawWidth * scale)),
     height: Math.max(180, Math.round(rawHeight * scale))
   }
+}
+
+function normalizeRenderedMermaidSvg(svg) {
+  const viewBox = svg
+    .match(/\bviewBox=["']([^"']+)["']/i)?.[1]
+    ?.trim()
+    .split(/[\s,]+/)
+    .map(Number)
+
+  if (!viewBox || viewBox.length !== 4) return svg
+
+  const [, , width, height] = viewBox
+  if (!Number.isFinite(width) || !Number.isFinite(height)) return svg
+
+  return svg
+    .replace(/\swidth=["'][^"']*["']/i, ` width="${Math.ceil(width)}"`)
+    .replace(/\sheight=["'][^"']*["']/i, '')
+    .replace(/<svg\b/i, `<svg height="${Math.ceil(height)}"`)
+    .replace(/\sstyle=["']max-width:\s*[^"']*;?["']/i, '')
 }
 
 function escapeHtml(value) {
@@ -188,7 +209,7 @@ async function renderMermaid(inputPath, outputPath) {
         margin: 0;
         background: #fff;
         color: #111;
-        font-family: "Noto Sans CJK SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+        font-family: ${mermaidFontFamily};
       }
       #capture {
         display: inline-block;
@@ -196,7 +217,10 @@ async function renderMermaid(inputPath, outputPath) {
         background: #fff;
       }
       svg {
+        width: auto;
+        height: auto;
         max-width: none;
+        overflow: visible;
       }
     </style>
   </head>
@@ -206,12 +230,16 @@ async function renderMermaid(inputPath, outputPath) {
 </html>`)
     await page.addScriptTag({ path: mermaidPath })
 
-    const renderError = await page.evaluate(async (source) => {
+    const renderResult = await page.evaluate(async ({ source, fontFamily }) => {
       try {
         window.mermaid.initialize({
           startOnLoad: false,
           securityLevel: 'loose',
           theme: 'default',
+          themeVariables: {
+            fontFamily,
+            fontSize: '16px'
+          },
           flowchart: { htmlLabels: true, useMaxWidth: false },
           sequence: { useMaxWidth: false },
           gantt: { useMaxWidth: false }
@@ -220,14 +248,20 @@ async function renderMermaid(inputPath, outputPath) {
           `diagram-${Date.now()}`,
           source
         )
-        document.querySelector('#capture').innerHTML = result.svg
-        return null
+        return { svg: result.svg }
       } catch (error) {
-        return error?.message || String(error)
+        return { error: error?.message || String(error) }
       }
-    }, diagram)
+    }, { source: diagram, fontFamily: mermaidFontFamily })
 
-    if (renderError) throw new Error(renderError)
+    if (renderResult.error) throw new Error(renderResult.error)
+    await page.$eval(
+      '#capture',
+      (element, svg) => {
+        element.innerHTML = svg
+      },
+      normalizeRenderedMermaidSvg(renderResult.svg)
+    )
     await page.evaluateHandle('document.fonts && document.fonts.ready')
 
     const box = await page.$eval('#capture', (element) => {

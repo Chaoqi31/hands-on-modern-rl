@@ -35,6 +35,9 @@ const options = {
   maxWidth: 1600,
   minSavingRatio: 0.98
 }
+const mermaidFontFamily =
+  '"Noto Sans CJK SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Arial Unicode MS", sans-serif'
+const mermaidRendererVersion = 'cjk-fixed-size-v1'
 const existingManifest = loadExistingManifest()
 
 function loadExistingManifest() {
@@ -69,6 +72,25 @@ function sha256(value) {
 
 function hashFile(filePath) {
   return sha256(fs.readFileSync(filePath))
+}
+
+function normalizeRenderedMermaidSvg(svg) {
+  const viewBox = svg
+    .match(/\bviewBox=["']([^"']+)["']/i)?.[1]
+    ?.trim()
+    .split(/[\s,]+/)
+    .map(Number)
+
+  if (!viewBox || viewBox.length !== 4) return svg
+
+  const [, , width, height] = viewBox
+  if (!Number.isFinite(width) || !Number.isFinite(height)) return svg
+
+  return svg
+    .replace(/\swidth=["'][^"']*["']/i, ` width="${Math.ceil(width)}"`)
+    .replace(/\sheight=["'][^"']*["']/i, '')
+    .replace(/<svg\b/i, `<svg height="${Math.ceil(height)}"`)
+    .replace(/\sstyle=["']max-width:\s*[^"']*;?["']/i, '')
 }
 
 function commandExists(command) {
@@ -708,12 +730,14 @@ async function renderMermaidBlocks(manifest) {
 
     if (
       previous?.hash === block.hash &&
+      previous.rendererVersion === mermaidRendererVersion &&
       previous.status === 'optimized' &&
       fs.existsSync(outputPath)
     ) {
       Object.assign(block, {
         status: 'optimized',
         type: 'mermaid-svg',
+        rendererVersion: previous.rendererVersion,
         optimized: previous.optimized,
         optimizedPath: previous.optimizedPath,
         sourceBytes: previous.sourceBytes,
@@ -776,14 +800,41 @@ async function renderMermaidBlocks(manifest) {
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     })
     const page = await browser.newPage()
+    await page.setViewport({
+      width: options.maxWidth,
+      height: options.maxWidth,
+      deviceScaleFactor: 1
+    })
+    await page.setContent(`<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <style>
+      body {
+        margin: 0;
+        background: #fff;
+        font-family: ${mermaidFontFamily};
+      }
+    </style>
+  </head>
+  <body></body>
+</html>`)
+    await page.evaluateHandle('document.fonts && document.fonts.ready')
     await page.addScriptTag({ path: mermaidRuntimePath })
-    await page.evaluate(() => {
+    await page.evaluate((fontFamily) => {
       window.mermaid.initialize({
         securityLevel: 'loose',
         startOnLoad: false,
-        theme: 'default'
+        theme: 'default',
+        themeVariables: {
+          fontFamily,
+          fontSize: '16px'
+        },
+        flowchart: { htmlLabels: true, useMaxWidth: false },
+        sequence: { useMaxWidth: false },
+        gantt: { useMaxWidth: false }
       })
-    })
+    }, mermaidFontFamily)
 
     for (const block of pendingBlocks) {
       const outputRelative = outputRelativeForMermaid(block)
@@ -804,10 +855,14 @@ async function renderMermaidBlocks(manifest) {
         )
 
         ensureDir(outputPath)
-        fs.writeFileSync(outputPath, `${svg.trim()}\n`)
+        fs.writeFileSync(
+          outputPath,
+          `${normalizeRenderedMermaidSvg(svg).trim()}\n`
+        )
         Object.assign(block, {
           status: 'optimized',
           type: 'mermaid-svg',
+          rendererVersion: mermaidRendererVersion,
           optimized: publicPathFor(outputRelative),
           optimizedPath: docsRelative(outputPath),
           sourceBytes: Buffer.byteLength(source),

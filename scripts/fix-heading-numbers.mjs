@@ -72,21 +72,24 @@ function firstH1InBody(bodyLines) {
 }
 
 function remapHeadingLine(line, oldM, oldMin, newM, newMin) {
-  const re = new RegExp(
-    `^(#{1,6}\\s+)${oldM}\\.${oldMin}(?=\\.|\\s|$)`
-  )
+  const re = new RegExp(`^(#{1,6}\\s+)${oldM}\\.${oldMin}(?=\\.|\\s|$)`)
   return line.replace(re, `$1${newM}.${newMin}`)
 }
 
 function applyMismatchFix(bodyLines, oldM, oldMin, newM, newMin) {
-  return bodyLines.map((line) => remapHeadingLine(line, oldM, oldMin, newM, newMin))
+  return bodyLines.map((line) =>
+    remapHeadingLine(line, oldM, oldMin, newM, newMin)
+  )
 }
 
 function applyMissingFix(bodyLines, newM, newMin, sidebarTitleRest) {
   const h1 = firstH1InBody(bodyLines)
   const newLine = `# ${newM}.${newMin} ${sidebarTitleRest.trim()}`
   if (h1.index === -1) {
-    if (bodyLines.length === 0 || (bodyLines.length === 1 && bodyLines[0] === '')) {
+    if (
+      bodyLines.length === 0 ||
+      (bodyLines.length === 1 && bodyLines[0] === '')
+    ) {
       return [newLine, '']
     }
     return [newLine, ...bodyLines]
