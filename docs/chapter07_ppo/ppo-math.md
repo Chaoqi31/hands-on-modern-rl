@@ -10,7 +10,7 @@
 - [优势函数 $A(s,a)$](../chapter06_actor_critic/advantage-function)——替代 $G_t$ 的低方差信号
 - [Critic 训练](../chapter06_actor_critic/critic-training)——价值函数损失的理论来源
 - [折扣累积回报 $G_t$](../chapter03_mdp/mdp)——从单步奖励到长期目标
-:::
+  :::
 
 PPO 的全称是 **Proximal Policy Optimization**，通常翻译成**近端策略优化**。这个名字可以拆开理解：
 

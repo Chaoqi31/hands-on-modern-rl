@@ -3,11 +3,12 @@
 上一节我们拆解了 PPO 的裁剪机制——一条用"裁剪"代替"KL 散度"的工程智慧（回顾：[信任域与裁剪](./trust-region-clipping)）。但 PPO 的目标函数里还有一个关键输入我们没展开：**优势函数 $A_t$**。怎么准确估计"这个动作比平均好了多少"？这就是 GAE（Generalized Advantage Estimation）要解决的问题。而在 LLM 场景下，PPO 还需要另一个更沉重的东西——**奖励模型（Reward Model）**。这一节我们把它们一起讲清楚。
 
 ::: tip 本节前置知识
+
 - [优势函数 $A(s,a) = Q - V$](../chapter06_actor_critic/advantage-function)——GAE 要估计的对象
 - [TD Error $\delta = r + \gamma V(s') - V(s)$](../chapter06_actor_critic/critic-training)——GAE 的基本构建块
 - [DP/MC/TD 三种方法](../chapter03_mdp/dp-mc-td)——GAE 是 TD 和 MC 的插值
 - [奖励函数设计](../chapter03_mdp/reward-design)——RM 的设计思路与第 3 章的奖励塑形一脉相承
-:::
+  :::
 
 ## 优势估计的困境：TD vs MC
 

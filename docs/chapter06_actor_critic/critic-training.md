@@ -3,10 +3,11 @@
 上一节定义了优势函数 $A(s,a) \approx \delta = r + \gamma V(s') - V(s)$，并引出了 Critic 网络作为 $V(s)$ 的估计器。本节展开第 3 章速览过的 [DP、MC、TD](../chapter03_mdp/dp-mc-td) 三种方法在 Critic 训练中的具体实现。
 
 ::: tip 本节会用到的前置知识
+
 - [DP/MC/TD 三种价值估计方法](../chapter03_mdp/dp-mc-td)——三种方法的原理和对比
 - [贝尔曼期望方程](../chapter03_mdp/bellman-equation)——DP 更新的理论基础
 - [TD Error $\delta$](../chapter03_mdp/dp-mc-td)——TD 方法的核心信号
-:::
+  :::
 
 ## DP：理论基准
 

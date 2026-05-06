@@ -12,7 +12,7 @@
 - [优势函数 $A(s,a)$](../chapter06_actor_critic/advantage-function)——PPO 的策略更新依赖优势信号
 - [TD Error 与 Critic 训练](../chapter06_actor_critic/critic-training)——PPO 中 Critic 的训练方式
 - [Actor-Critic 架构](../chapter06_actor_critic/actor-critic)——PPO 是 Actor-Critic 的变体
-:::
+  :::
 
 本章沿着"动手 → 理论 → 约束 → 估计"的路径展开：先跑一个 PPO 训练实验，亲眼看到训练曲线和各种指标；再拆解背后的数学原理、裁剪机制和优势估计方法。
 

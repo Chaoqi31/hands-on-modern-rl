@@ -15,13 +15,13 @@
 - [TD Error $\delta = r + \gamma V(s') - V(s)$](../chapter03_mdp/dp-mc-td)——Critic 的核心训练信号
 - [策略目标 $J(\theta)$ 与策略梯度](../chapter03_mdp/policy-objective)——Actor 的优化目标
 - [REINFORCE 与基线实验](../chapter05_policy_gradient/baseline-experiment)——为什么需要 $V(s)$ 作为基线
-:::
+  :::
 
 ## 本章结构
 
 | 小节                                 | 核心问题                                            |
 | ------------------------------------ | --------------------------------------------------- |
-| [优势函数](./advantage-function)     | 优势函数 $A(s,a)$ 是什么？为什么它比 $G_t$ 更好？  |
+| [优势函数](./advantage-function)     | 优势函数 $A(s,a)$ 是什么？为什么它比 $G_t$ 更好？   |
 | [Critic 训练方法](./critic-training) | 怎么训练 Critic 来估计 $V(s)$？DP/MC/TD 的具体实现  |
 | [Actor-Critic 架构](./actor-critic)  | Actor 和 Critic 怎么协作？TD Error 如何替代 $G_t$？ |
 | [项目：AlphaGo 简易复现](./alphago)  | Actor-Critic + MCTS 能做什么？                      |

@@ -17,6 +17,7 @@ Q(s,a;\theta) \approx r + \gamma \max_{a'} Q(s',a';\theta^-) \quad \text{（DQN 
 $$
 
 > **DQN TD Target：**
+>
 > - $\theta$：在线 Q-Network 的参数，每步更新。
 > - $\theta^-$：目标网络参数，定期从 $\theta$ 复制过来，保持 TD Target 短期内稳定。
 > - $\max_{a'} Q(s',a';\theta^-)$：目标网络对下一状态所有动作 Q 值取最大，代表"未来能拿到的最好分数"。
@@ -26,6 +27,7 @@ $$
 $$
 
 > **DQN 损失函数：**
+>
 > - $\mathcal{D}$：经验回放池，存储历史转移 $(s,a,r,s')$ 并随机采样，打破训练数据的时间相关性。
 > - 括号内即 TD Error $\delta = r + \gamma \max_{a'} Q(s',a';\theta^-) - Q(s,a;\theta)$，对它取均方就得到损失。
 

@@ -5,10 +5,11 @@
 但 REINFORCE 有一个致命问题——方差太大。这一节我们用一个简单但有效的改进来压制噪声：**减掉一个基线**。通过对比实验，亲眼看看有基线和没基线的差距。
 
 ::: tip 本节会用到的前置知识
+
 - [策略梯度公式](../chapter03_mdp/policy-objective) $\nabla_\theta J \propto \mathbb{E}[\nabla_\theta \log \pi_\theta(a|s) \cdot G_t]$——基线要加在哪个公式里
 - [状态价值 $V(s)$](../chapter03_mdp/bellman-equation)——最好的基线是什么
 - [MC 方法](../chapter03_mdp/dp-mc-td)——为什么 REINFORCE 必须跑完 episode 才能更新
-:::
+  :::
 
 ## 实验设计
 

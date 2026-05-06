@@ -3,11 +3,12 @@
 前两节我们认识了[优势函数](./advantage-function) $A(s,a)$ 和 [Critic 的训练方法](./critic-training)。现在让我们把所有零件组装起来，看看 Actor 和 Critic 是如何协作的。
 
 ::: tip 本节会用到的前置知识
+
 - [优势函数 $A(s,a) = Q(s,a) - V(s)$](./advantage-function)——"这个动作比平均好了多少"
 - [TD Error $\delta = r + \gamma V(s') - V(s)$](./critic-training)——优势函数的实用估计
 - [策略梯度 $\nabla_\theta J \approx \nabla_\theta \log \pi(a|s) \cdot G_t$](../chapter05_policy_gradient/policy-gradient)——Actor 的更新公式
 - [REINFORCE 与基线实验](../chapter05_policy_gradient/baseline-experiment)——从 $G_t$ 到 $G_t - V(s)$ 的动机
-:::
+  :::
 
 ## 从 REINFORCE 到 Actor-Critic：关键的一步
 
@@ -195,11 +196,11 @@ Actor-Critic 在 CartPole 上通常在 200-300 个 episode 内就能稳定到 50
 
 Actor-Critic 不是终点，而是一个骨架。后续章节中你会看到它的各种变体：
 
-| 章节                    | 变体              | 关键改进                                          |
-| ----------------------- | ----------------- | ------------------------------------------------- |
-| [第 7 章 PPO](../chapter07_ppo/intro)  | PPO-Clip          | 限制策略更新幅度，防止"步子迈太大"                |
-| [第 7 章 GAE](../chapter07_ppo/gae-reward-model)  | 广义优势估计      | 多步 TD Error 的指数加权和，精确控制偏差-方差权衡 |
-| [第 9 章 DPO](../chapter09_alignment/intro)  | 隐式 Actor-Critic | 用偏好数据替代 Critic，去掉 on-policy 的限制      |
+| 章节                                                               | 变体              | 关键改进                                          |
+| ------------------------------------------------------------------ | ----------------- | ------------------------------------------------- |
+| [第 7 章 PPO](../chapter07_ppo/intro)                              | PPO-Clip          | 限制策略更新幅度，防止"步子迈太大"                |
+| [第 7 章 GAE](../chapter07_ppo/gae-reward-model)                   | 广义优势估计      | 多步 TD Error 的指数加权和，精确控制偏差-方差权衡 |
+| [第 9 章 DPO](../chapter09_alignment/intro)                        | 隐式 Actor-Critic | 用偏好数据替代 Critic，去掉 on-policy 的限制      |
 | [第 9 章 GRPO](../chapter09_grpo_rlvr/grpo-practice-and-mechanism) | 去掉 Critic       | 用组内均值替代 $V(s)$，省掉一个网络               |
 
 所有的变体都共享同一个骨架：一个负责选择的网络 + 一个负责评估的信号。变化的只是"评估信号怎么来"和"选择网络怎么更新"。

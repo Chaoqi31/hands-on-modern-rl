@@ -45,14 +45,14 @@ Q-Learning 的表格在这些高维状态空间面前不再适用。
 
 ## 章节安排
 
-| 小节                                               | 核心问题                                             |
-| -------------------------------------------------- | ---------------------------------------------------- |
-| [动手：Q-Learning 与 GridWorld](./q-learning)      | GridWorld 游戏跑起来，Q 值怎么收敛？原理是什么？     |
+| 小节                                                            | 核心问题                                             |
+| --------------------------------------------------------------- | ---------------------------------------------------- |
+| [动手：Q-Learning 与 GridWorld](./q-learning)                   | GridWorld 游戏跑起来，Q 值怎么收敛？原理是什么？     |
 | [为什么需要 DQN：Q 表格的局限与神经网络的替代](./from-q-to-dqn) | Q-Learning 的表格为什么装不下？神经网络怎么替代？    |
-| [DQN 三大组件](./dqn-components)                   | Q-Network、经验回放、目标网络分别解决什么问题？      |
-| [观察训练过程](./training-analysis)                | 经验回放和目标网络各自起了什么作用？                 |
-| [DQN 家族与视角迁移](./dqn-family)                 | 从 Double DQN 到 Rainbow，DQN 的思想如何延续到 LLM？ |
-| [项目：DQN 实战与视觉游戏](./visual-game-projects) | CartPole 从零实现，再迁移到 Atari、ViZDoom、宝可梦   |
+| [DQN 三大组件](./dqn-components)                                | Q-Network、经验回放、目标网络分别解决什么问题？      |
+| [观察训练过程](./training-analysis)                             | 经验回放和目标网络各自起了什么作用？                 |
+| [DQN 家族与视角迁移](./dqn-family)                              | 从 Double DQN 到 Rainbow，DQN 的思想如何延续到 LLM？ |
+| [项目：DQN 实战与视觉游戏](./visual-game-projects)              | CartPole 从零实现，再迁移到 Atari、ViZDoom、宝可梦   |
 
 ## 学习目标
 

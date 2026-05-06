@@ -3,9 +3,10 @@
 前面我们跑通了 PPO 的 LunarLander 实验，也推导了裁剪代理目标的数学形式（回顾：[PPO 数学推导](./ppo-math)）。但一个核心问题还没回答：裁剪机制到底在保护什么？为什么简单的策略梯度会崩溃？这一切要从"策略更新的危险性"说起。
 
 ::: tip 本节前置知识
+
 - [策略梯度更新公式](../chapter05_policy_gradient/policy-gradient)——裁剪要保护的正是这个更新
 - [优势函数 $A(s,a)$](../chapter06_actor_critic/advantage-function)——策略更新的方向信号
-:::
+  :::
 
 ## 朴素策略梯度的问题：一步错，满盘皆输
 
