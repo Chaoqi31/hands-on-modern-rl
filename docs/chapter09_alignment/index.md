@@ -1,5 +1,5 @@
 ---
-title: 第 8 章：对齐与推理强化（DPO / GRPO / RLVR）
+title: 第 9 章：对齐与推理强化（DPO / GRPO / RLVR）
 ---
 
 <script setup>

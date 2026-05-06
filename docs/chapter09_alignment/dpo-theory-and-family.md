@@ -477,7 +477,7 @@ $$r(x,y) = \beta \log \frac{\pi_\theta(y\mid x)}{\pi_{\text{ref}}(y\mid x)}$$
 
 ### 第三步：代入 Bradley-Terry 模型
 
-回顾第 6 章的 Bradley-Terry 偏好模型：
+回顾[上一章 RLHF](../chapter08_rlhf/reward-function-design)和[第 7 章 GAE](../chapter07_ppo/gae-reward-model)中的 Bradley-Terry 偏好模型：
 
 $$P(y_w > y_l \mid x) = \sigma\left( r(x, y_w) - r(x, y_l) \right)$$
 
@@ -516,7 +516,7 @@ $$
 
 $$\mathcal{L}_{\text{DPO}} = -\mathbb{E}_{(x, y_w, y_l)} \left[ \log \sigma \left( \beta \log \frac{\pi_\theta(y_w\mid x)}{\pi_{\text{ref}}(y_w\mid x)} - \beta \log \frac{\pi_\theta(y_l\mid x)}{\pi_{\text{ref}}(y_l\mid x)} \right) \right]$$
 
-这就是你在第 2 章代码里调的那个 `DPOTrainer` 背后的真正面目：
+这就是你在[第 2 章](../chapter02_dpo/intro)代码里调的那个 `DPOTrainer` 背后的真正面目：
 
 <DpoCodeFocus focus="loss" />
 
@@ -653,7 +653,7 @@ print(f"奖励差距: {r_good - r_bad:.4f}")
 隐式奖励的意义在于：**DPO 不是没有奖励模型，而是把奖励模型"藏"在了策略模型内部**。你不需要额外训练和维护一个独立的 RM——策略模型自己就能给自己打分。这就是 DPO 名字中"Direct"（直接）的含义：**直接**从偏好数据中学习策略，**跳过**显式训练 RM 的中间步骤。
 
 <details>
-<summary>思考题：DPO 的隐式奖励 $r(x,y) = \beta \log(\pi_\theta / \pi_{\text{ref}})$ 和第 6 章 PPO 的 KL 惩罚有什么关系？</summary>
+<summary>思考题：DPO 的隐式奖励 $r(x,y) = \beta \log(\pi_\theta / \pi_{\text{ref}})$ 和[第 7 章 PPO](../chapter07_ppo/trust-region-clipping) 的 KL 惩罚有什么关系？</summary>
 
 它们本质上是同一个东西的两面。PPO 的目标函数中有 $-\beta \cdot D_{\text{KL}}(\pi_\theta \| \pi_{\text{ref}})$ 这一项，防止策略偏离参考模型太远。而 DPO 的隐式奖励 $\beta \log(\pi_\theta / \pi_{\text{ref}})$ 就是 KL 散度中的对数项——它是 KL 散度的"逐点版本"。
 
@@ -751,7 +751,7 @@ flowchart TD
     DPO --> SimPO["SimPO (2024)\n1 个模型\n去掉 Reference"]
     DPO --> IPO["IPO (2024)\nKL 正则化\n更稳健"]
 
-    DPO --> GRPO["GRPO (2025)\n无 Critic\n第 8 章详解"]
+    DPO --> GRPO["GRPO (2025)\n无 Critic\n本章 9.3 详解"]
 
     style PPO fill:#fce4ec,stroke:#c62828
     style DPO fill:#fff3e0,stroke:#f57c00

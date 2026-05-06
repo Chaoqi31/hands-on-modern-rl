@@ -752,11 +752,17 @@ Tulu 3 完整开源数据、代码和训练 recipe，主题就是 multi-stage po
 
 ## 参考资料
 
+### 国内公司与实验室
+
+#### MiniMax
+
 [^minimax_m2_1]: [MiniMax M2.1: Post-Training Experience and Insights for Agent Models](https://www.minimax.io/news/post-training-experience-and-insights-for-agent-models)
 
 [^minimax_m1]: [MiniMax-M1: Scaling Test-Time Compute Efficiently with Lightning Attention](https://arxiv.org/abs/2506.13585)
 
 [^minimax_webexplorer]: [WebExplorer: Explore and Evolve for Training Long-Horizon Web Agents](https://arxiv.org/abs/2509.06501)
+
+#### 阿里 Qwen / 通义
 
 [^qwen2_5]: [Qwen2.5 Technical Report](https://arxiv.org/abs/2412.15115)
 
@@ -772,11 +778,15 @@ Tulu 3 完整开源数据、代码和训练 recipe，主题就是 multi-stage po
 
 [^tongyi_dr]: [Tongyi DeepResearch Technical Report](https://arxiv.org/abs/2510.24701)
 
+#### Moonshot Kimi
+
 [^kimi_k1_5]: [Kimi k1.5: Scaling Reinforcement Learning with LLMs](https://arxiv.org/abs/2501.12599)
 
 [^kimi_k2]: [Kimi K2: Open Agentic Intelligence](https://arxiv.org/abs/2507.20534)
 
 [^kimi_researcher]: [Kimi-Researcher: End-to-End RL Training for Emerging Agentic Capabilities](https://moonshotai.github.io/Kimi-Researcher/)
+
+#### 字节 Seed / Doubao
 
 [^seed1_5_thinking]: [Seed1.5-Thinking: Advancing Superb Reasoning Models with Reinforcement Learning](https://arxiv.org/abs/2504.13914)
 
@@ -798,15 +808,21 @@ Tulu 3 完整开源数据、代码和训练 recipe，主题就是 multi-stage po
 
 [^seed1_8]: [Official Release of Seed1.8: A Generalized Agentic Model](https://seed.bytedance.com/en/blog/official-release-of-seed1-8-a-generalized-agentic-model)
 
+#### DeepSeek
+
 [^deepseek_math]: [DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models](https://arxiv.org/abs/2402.03300)
 
 [^deepseek_r1]: [DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning](https://arxiv.org/abs/2501.12948)
 
 [^deepseek_v3_2]: [DeepSeek-V3.2: Pushing the Frontier of Open Large Language Models](https://arxiv.org/abs/2512.02556)
 
+#### 智谱 Z.ai / GLM
+
 [^glm_4_5]: [GLM-4.5: Agentic, Reasoning, and Coding Foundation Models](https://arxiv.org/abs/2508.06471)
 
 [^glm_5]: [GLM-5: from Vibe Coding to Agentic Engineering](https://arxiv.org/html/2602.15763v1)
+
+#### 腾讯混元 Hunyuan
 
 [^hunyuan_t1]: [Hunyuan-T1](https://tencent.github.io/llm.hunyuan.T1/README_EN.html)
 
@@ -814,11 +830,15 @@ Tulu 3 完整开源数据、代码和训练 recipe，主题就是 multi-stage po
 
 [^hunyuan_a13b]: [Hunyuan-A13B Technical Report](https://github.com/Tencent-Hunyuan/Hunyuan-A13B/blob/main/report/Hunyuan_A13B_Technical_Report.pdf)
 
+#### 百度 ERNIE
+
 [^ernie_4_5_family]: [ERNIE 4.5 Model Family](https://ernie.baidu.com/blog/posts/ernie4.5/)
 
 [^ernie_4_5]: [ERNIE 4.5 Technical Report](https://ernie.baidu.com/blog/publication/ERNIE_Technical_Report.pdf)
 
 [^ernie_5_0]: [ERNIE 5.0 Technical Report](https://arxiv.org/abs/2602.04705)
+
+#### 阶跃星辰 StepFun
 
 [^step3]: [Step3: Cost-Effective Multimodal Intelligence](https://stepfun.ai/research/en/step3)
 
@@ -826,11 +846,17 @@ Tulu 3 完整开源数据、代码和训练 recipe，主题就是 multi-stage po
 
 [^step_deepresearch]: [Step-DeepResearch Technical Report](https://arxiv.org/abs/2512.20491)
 
+#### 美团 LongCat
+
 [^longcat_flash]: [LongCat-Flash-Thinking-2601 技术报告](https://tech.meituan.com/2026/02/02/longcat-flash-thinking-2601-techreport.html)
+
+#### 蚂蚁 Ling / Ring
 
 [^ling_1t]: [Ling-1T Model](https://ant-ling.medium.com/deep-insight-efficient-inference-introducing-the-trillion-parameter-ling-1t-model-77d6170e5e8e)
 
 [^ring_1t]: [Ring-1T](https://ant-ling.medium.com/ring-1t-release-the-flow-state-of-insight-born-of-epiphany-c20e8e32817c)
+
+#### 华为 Pangu
 
 [^pangu_ultra]: [Pangu Ultra](https://github.com/pangu-tech/pangu-ultra)
 
@@ -838,19 +864,25 @@ Tulu 3 完整开源数据、代码和训练 recipe，主题就是 multi-stage po
 
 [^pangu_news]: [华为宣布开源盘古 7B 稠密和 72B 混合专家模型](https://www.huawei.com/cn/news/2025/7/pangu-opensource)
 
+#### 01.AI Yi
+
 [^yi_lightning]: [Yi-Lightning Technical Report](https://arxiv.org/abs/2412.01253)
 
+#### InternLM / 上海 AI Lab
+
 [^internlm2]: [InternLM2 Technical Report](https://arxiv.org/abs/2403.17297)
+
+#### 百川 Baichuan 与 360 智脑
 
 [^baichuan2]: [Baichuan 2: Open Large-scale Language Models](https://arxiv.org/abs/2309.10305)
 
 [^zhinao]: [360Zhinao Technical Report](https://arxiv.org/abs/2405.13386)
 
+#### 昆仑万维 Skywork 与小米 MiMo
+
 [^skywork_or1]: [Skywork Open Reasoner 1 Technical Report](https://huggingface.co/papers/2505.22312)
 
 [^skywork_or1_github]: [Skywork-OR1 GitHub Repository](https://github.com/SkyworkAI/Skywork-OR1)
-
-[^keye_vl]: [Kwai Keye-VL Technical Report](https://arxiv.org/abs/2507.01949)
 
 [^mimo]: [MiMo: Unlocking the Reasoning Potential of Language Model -- From Pretraining to Posttraining](https://arxiv.org/abs/2505.07608)
 
@@ -858,9 +890,17 @@ Tulu 3 完整开源数据、代码和训练 recipe，主题就是 multi-stage po
 
 [^mimo_vl]: [Xiaomi MiMo-VL-Miloco Technical Report](https://arxiv.org/abs/2512.17436)
 
+#### 快手、商汤、讯飞
+
+[^keye_vl]: [Kwai Keye-VL Technical Report](https://arxiv.org/abs/2507.01949)
+
 [^sensenova_u1]: [SenseNova U1](https://www.sensetime.com/en/news-detail/51170629?categoryId=1072)
 
 [^spark_x1]: [Spark X1 deep reasoning model](https://news.cgtn.com/news/2025-01-15/China-releases-Spark-X1-deep-reasoning-model-that-packs-a-punch-1AbIq8PzzEI/index.html)
+
+### 国外公司与实验室
+
+#### OpenAI
 
 [^instructgpt]: [Training language models to follow instructions with human feedback](https://arxiv.org/abs/2203.02155)
 
@@ -890,6 +930,8 @@ Tulu 3 完整开源数据、代码和训练 recipe，主题就是 multi-stage po
 
 [^gpt5_2_codex]: [Introducing GPT-5.2-Codex](https://openai.com/index/introducing-gpt-5-2-codex/)
 
+#### Anthropic
+
 [^constitutional_ai]: [Constitutional AI: Harmlessness from AI Feedback](https://arxiv.org/abs/2212.08073)
 
 [^anthropic_cai]: [Anthropic Constitutional AI overview](https://www.anthropic.com/research/constitutional-ai-harmlessness-from-ai-feedback)
@@ -901,6 +943,8 @@ Tulu 3 完整开源数据、代码和训练 recipe，主题就是 multi-stage po
 [^claude_opus_4_5]: [Claude Opus 4.5 System Card](https://www.anthropic.com/claude-opus-4-5-system-card)
 
 [^claude_opus_4_6]: [Claude Opus 4.6 System Card](https://www-cdn.anthropic.com/0dd865075ad3132672ee0ab40b05a53f14cf5288.pdf)
+
+#### Google DeepMind
 
 [^gemini_1_5]: [Gemini 1.5 Technical Report](https://arxiv.org/abs/2403.05530)
 
@@ -914,11 +958,17 @@ Tulu 3 完整开源数据、代码和训练 recipe，主题就是 multi-stage po
 
 [^gemma_3]: [Gemma 3 Technical Report](https://arxiv.org/abs/2503.19786)
 
+#### Meta Llama
+
 [^llama3_herd]: [The Llama 3 Herd of Models](https://arxiv.org/abs/2407.21783)
+
+#### Microsoft Phi
 
 [^phi_4]: [Phi-4 Technical Report](https://arxiv.org/abs/2412.08905)
 
 [^phi_4_reasoning]: [Phi-4-reasoning Technical Report](https://arxiv.org/abs/2504.21318)
+
+#### NVIDIA Nemotron
 
 [^nemotron_4]: [Nemotron-4 340B Technical Report](https://arxiv.org/abs/2406.11704)
 
@@ -932,11 +982,17 @@ Tulu 3 完整开源数据、代码和训练 recipe，主题就是 multi-stage po
 
 [^nemotron_3]: [Inside NVIDIA Nemotron 3](https://developer.nvidia.com/blog/inside-nvidia-nemotron-3-techniques-tools-and-data-that-make-it-efficient-and-accurate/)
 
+#### Mistral
+
 [^magistral]: [Magistral](https://arxiv.org/abs/2506.10910)
+
+#### Apple
 
 [^apple_fm]: [Apple Intelligence Foundation Language Models](https://machinelearning.apple.com/research/apple-intelligence-foundation-language-models)
 
 [^apple_fm_2025]: [Apple Intelligence Foundation Language Models Tech Report 2025](https://machinelearning.apple.com/research/apple-foundation-models-tech-report-2025)
+
+#### xAI Grok
 
 [^grok_1]: [xAI Grok-1 Model Card](https://x.ai/news/grok/model-card)
 
@@ -946,15 +1002,21 @@ Tulu 3 完整开源数据、代码和训练 recipe，主题就是 multi-stage po
 
 [^grok_4_1_card]: [xAI Grok 4.1 Model Card](https://data.x.ai/2025-11-17-grok-4-1-model-card.pdf)
 
+#### IBM Granite
+
 [^granite_3_3]: [IBM Granite 3.3](https://www.ibm.com/new/announcements/ibm-granite-3-3-speech-recognition-refined-reasoning-rag-loras)
 
 [^granite_4_0]: [IBM Granite 4.0](https://www.ibm.com/new/announcements/ibm-granite-4-0-hyper-efficient-high-performance-hybrid-models)
 
 [^granite_4_1]: [IBM Granite 4.1 Build Notes](https://huggingface.co/blog/ibm-granite/granite-4-1)
 
+#### Salesforce xLAM / SFR-RL
+
 [^xlam]: [Salesforce xLAM](https://www.salesforce.com/blog/large-action-model-ai-agent/)
 
 [^sfr_rl]: [Salesforce SFR-RL](https://www.salesforce.com/blog/efficient-rl-training-agentic-era/)
+
+#### Amazon Nova
 
 [^nova]: [Amazon Nova](https://aws.amazon.com/nova/)
 
@@ -964,25 +1026,41 @@ Tulu 3 完整开源数据、代码和训练 recipe，主题就是 multi-stage po
 
 [^nova_forge]: [Amazon Nova Forge](https://aws.amazon.com/nova/forge/)
 
+#### Cohere Command A
+
 [^cohere_research]: [Cohere Research](https://cohere.com/research)
 
 [^command_a]: [Command A: An Enterprise-Ready Large Language Model](https://cohere.com/research/papers/command-a-technical-report.pdf)
 
+#### Databricks
+
 [^dbrx]: [DBRX Instruct](https://huggingface.co/databricks/dbrx-instruct)
+
+#### AI21
 
 [^jamba_1_5a]: [Jamba 1.5a: Enhancing AI Safety Through Post-Post-Training Alignment](https://www.ai21.com/research/jamba-1-5a/)
 
 [^jamba_whitepaper]: [Jamba 1.5a Whitepaper](https://lp.ai21.com/hubfs/resources/Jamba-1-5a-Whitepaper.pdf)
 
+#### Cursor
+
 [^cursor_composer_2]: [Cursor Composer 2 Technical Report](https://cursor.com/blog/composer-2-technical-report)
+
+#### LG EXAONE
 
 [^exaone_4_0]: [EXAONE 4.0 Technical Report](https://www.lgresearch.ai/data/cdn/upload/EXAONE_4_0.pdf)
 
 [^k_exaone]: [K-EXAONE Technical Report](https://www.lgresearch.ai/data/cdn/upload/K-EXAONE_Technical_Report.pdf)
 
+#### NAVER HyperCLOVA X
+
 [^hyperclova_x]: [HyperCLOVA X Technical Report](https://arxiv.org/abs/2404.01954)
 
 [^hyperclova_x_think]: [HyperCLOVA X THINK Technical Report](https://huggingface.co/papers/2506.22403)
+
+### 开源基线与综述
+
+#### AI2 Tulu / Survey
 
 [^tulu_3]: [Tulu 3: Pushing Frontiers in Open Language Model Post-Training](https://openreview.net/forum?id=i1uGbfHHpH)
 
