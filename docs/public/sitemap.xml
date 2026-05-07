@@ -2,13 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/appendix_code_cheatsheet/attention-mha/</loc>
-    <lastmod>2026-05-07T01:21:16.021Z</lastmod>
+    <lastmod>2026-05-07T08:47:43.865Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/appendix_code_cheatsheet/dapo/</loc>
-    <lastmod>2026-05-07T01:21:16.040Z</lastmod>
+    <lastmod>2026-05-07T08:47:43.879Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -26,7 +26,7 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/appendix_code_cheatsheet/intro/</loc>
-    <lastmod>2026-05-07T01:21:33.283Z</lastmod>
+    <lastmod>2026-05-07T08:47:43.888Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -44,13 +44,13 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/appendix_code_cheatsheet/softmax-ce/</loc>
-    <lastmod>2026-05-07T01:21:15.980Z</lastmod>
+    <lastmod>2026-05-07T08:47:43.895Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/appendix_code_cheatsheet/top-k-top-p/</loc>
-    <lastmod>2026-05-07T01:21:16.005Z</lastmod>
+    <lastmod>2026-05-07T08:47:43.906Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -332,7 +332,7 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter03_mdp/bandit/</loc>
-    <lastmod>2026-05-07T01:45:27.860Z</lastmod>
+    <lastmod>2026-05-07T08:47:43.980Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -392,7 +392,7 @@
   </url>
   <url>
     <loc>https://walkinglabs.github.io/hands-on-modern-rl/chapter03_mdp/value-bellman/</loc>
-    <lastmod>2026-05-07T08:13:06.375Z</lastmod>
+    <lastmod>2026-05-07T08:48:56.106Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>

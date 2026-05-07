@@ -230,29 +230,32 @@ async function renderMermaid(inputPath, outputPath) {
 </html>`)
     await page.addScriptTag({ path: mermaidPath })
 
-    const renderResult = await page.evaluate(async ({ source, fontFamily }) => {
-      try {
-        window.mermaid.initialize({
-          startOnLoad: false,
-          securityLevel: 'loose',
-          theme: 'default',
-          themeVariables: {
-            fontFamily,
-            fontSize: '16px'
-          },
-          flowchart: { htmlLabels: true, useMaxWidth: false },
-          sequence: { useMaxWidth: false },
-          gantt: { useMaxWidth: false }
-        })
-        const result = await window.mermaid.render(
-          `diagram-${Date.now()}`,
-          source
-        )
-        return { svg: result.svg }
-      } catch (error) {
-        return { error: error?.message || String(error) }
-      }
-    }, { source: diagram, fontFamily: mermaidFontFamily })
+    const renderResult = await page.evaluate(
+      async ({ source, fontFamily }) => {
+        try {
+          window.mermaid.initialize({
+            startOnLoad: false,
+            securityLevel: 'loose',
+            theme: 'default',
+            themeVariables: {
+              fontFamily,
+              fontSize: '16px'
+            },
+            flowchart: { htmlLabels: true, useMaxWidth: false },
+            sequence: { useMaxWidth: false },
+            gantt: { useMaxWidth: false }
+          })
+          const result = await window.mermaid.render(
+            `diagram-${Date.now()}`,
+            source
+          )
+          return { svg: result.svg }
+        } catch (error) {
+          return { error: error?.message || String(error) }
+        }
+      },
+      { source: diagram, fontFamily: mermaidFontFamily }
+    )
 
     if (renderResult.error) throw new Error(renderResult.error)
     await page.$eval(
