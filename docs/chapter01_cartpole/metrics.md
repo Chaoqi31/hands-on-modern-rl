@@ -537,7 +537,7 @@ Clip Fraction 即安全阀被触发的比例。
 | **Clip Fraction** | 0% ~ 20%     | 长期 > 30% | 太低说明裁剪范围过宽；太高说明策略变化过于剧烈 |
 
 > **动手实验**：打开 [2-pytorch_ppo.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter01_cartpole/2-pytorch_ppo.py)，
-> 找到 `clip_range` 参数，把它从 `0.2` 改成 `0.5`，重新运行。
+> 找到 `clip_eps` 参数，把它从 `0.2` 改成 `0.5`，重新运行。
 > 你会看到 Clip Fraction 急剧下降（裁剪范围太宽，几乎不会触发），
 > 同时 Approx KL 会升高（策略在"裸奔"，没有约束）。
 
