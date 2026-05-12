@@ -1,4 +1,4 @@
-# 7.5 GAE、奖励模型与 LLM 对齐
+# 7.4 GAE、奖励模型与 LLM 对齐
 
 上一节我们拆解了 PPO 的裁剪机制——一条用"裁剪"代替"KL 散度"的工程智慧（回顾：[信任域与裁剪](./trust-region-clipping)）。但 PPO 的目标函数里还有一个关键输入我们没展开：**优势函数 $A_t$**。怎么准确估计"这个动作比平均好了多少"？这就是 GAE（Generalized Advantage Estimation）要解决的问题。而在 LLM 场景下，PPO 还需要另一个更沉重的东西——**奖励模型（Reward Model）**。这一节我们把它们一起讲清楚。
 

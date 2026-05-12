@@ -408,7 +408,7 @@ flowchart LR
 
 **3. 工程复杂**：四个模型各有一套优化器、学习率、梯度裁剪配置，调参难度指数级增长。
 
-回顾[第 5 章基线实验](../chapter05_policy_gradient/baseline-experiment)和[第 6 章优势函数](../chapter06_actor_critic/advantage-function)，Critic 的核心作用是**提供基线来降低方差**。如果不需要单独训练网络就能得到基线，Critic 就可以退休了。
+回顾[第 5 章基线分析](../chapter05_policy_gradient/pg-improvements)和[第 6 章优势函数](../chapter06_actor_critic/advantage-function)，Critic 的核心作用是**提供基线来降低方差**。如果不需要单独训练网络就能得到基线，Critic 就可以退休了。
 
 ### GRPO 的核心思路
 

@@ -16,6 +16,7 @@ BipedalWalker-v3 的教学意义：
 
 import argparse
 import os
+from pathlib import Path
 import gymnasium as gym
 import numpy as np
 import matplotlib.pyplot as plt
@@ -154,62 +155,76 @@ print("训练完成！")
 
 
 # ==========================================
-# 第五部分：绘制训练曲线
+# 第五部分：绘制训练曲线（4 张独立图）
 # ==========================================
 print("\n正在绘制训练曲线...")
 
-fig, axes = plt.subplots(2, 2, figsize=(14, 10))
-fig.suptitle("PPO 训练 BipedalWalker-v3 — 训练指标监控", fontsize=16, fontweight="bold")
+output_dir = Path("output")
+output_dir.mkdir(exist_ok=True)
 
-# 子图1：回合奖励曲线
-ax1 = axes[0, 0]
+# 图1：回合奖励曲线
 if callback.episode_rewards:
     rewards = callback.episode_rewards
     window = min(50, max(1, len(rewards)))
     smoothed = np.convolve(rewards, np.ones(window) / window, mode="valid")
-    ax1.plot(smoothed, color="#2196F3", alpha=0.8, linewidth=1.5)
-    ax1.axhline(y=300, color="green", linestyle="--", alpha=0.5, label="solved (300)")
-    ax1.set_title("回合奖励（滑动平均）", fontsize=13)
-    ax1.set_xlabel("回合")
-    ax1.set_ylabel("累计奖励")
-    ax1.legend()
-    ax1.grid(True, alpha=0.3)
 
-# 子图2：策略熵
-ax2 = axes[0, 1]
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.plot(smoothed, color="#2196F3", alpha=0.8, linewidth=1.5, label="滑动平均")
+    ax.axhline(y=300, color="green", linestyle="--", alpha=0.5, label="solved (300)")
+    ax.axhline(y=0, color="gray", linestyle=":", alpha=0.3)
+    ax.set_title("PPO BipedalWalker-v3 回合奖励", fontsize=14, fontweight="bold")
+    ax.set_xlabel("回合")
+    ax.set_ylabel("累计奖励")
+    ax.legend()
+    ax.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(output_dir / "ppo_bipedal_walker_reward.png", dpi=150, bbox_inches="tight")
+    plt.close()
+    print("  奖励曲线 → output/ppo_bipedal_walker_reward.png")
+
+# 图2：策略熵
 if callback.entropy_list:
-    ax2.plot(callback.timesteps_list, callback.entropy_list,
-             color="#FF9800", alpha=0.8, linewidth=1.5)
-    ax2.set_title("策略熵（探索程度）", fontsize=13)
-    ax2.set_xlabel("时间步")
-    ax2.set_ylabel("熵")
-    ax2.grid(True, alpha=0.3)
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.plot(callback.timesteps_list, callback.entropy_list,
+            color="#FF9800", alpha=0.8, linewidth=1.5)
+    ax.set_title("PPO BipedalWalker-v3 策略熵", fontsize=14, fontweight="bold")
+    ax.set_xlabel("时间步")
+    ax.set_ylabel("熵")
+    ax.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(output_dir / "ppo_bipedal_walker_entropy.png", dpi=150, bbox_inches="tight")
+    plt.close()
+    print("  策略熵曲线 → output/ppo_bipedal_walker_entropy.png")
 
-# 子图3：裁剪比例
-ax3 = axes[1, 0]
+# 图3：裁剪比例
 if callback.clip_fraction_list:
-    ax3.plot(callback.timesteps_list, callback.clip_fraction_list,
-             color="#F44336", alpha=0.8, linewidth=1.5)
-    ax3.axhline(y=0.2, color="gray", linestyle="--", alpha=0.5, label="clip_range=0.2")
-    ax3.set_title("裁剪比例（clip fraction）", fontsize=13)
-    ax3.set_xlabel("时间步")
-    ax3.set_ylabel("被裁剪的比例")
-    ax3.legend()
-    ax3.grid(True, alpha=0.3)
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.plot(callback.timesteps_list, callback.clip_fraction_list,
+            color="#F44336", alpha=0.8, linewidth=1.5, label="clip fraction")
+    ax.axhline(y=0.2, color="gray", linestyle="--", alpha=0.5, label="clip_range=0.2")
+    ax.set_title("PPO BipedalWalker-v3 裁剪比例", fontsize=14, fontweight="bold")
+    ax.set_xlabel("时间步")
+    ax.set_ylabel("被裁剪的比例")
+    ax.legend()
+    ax.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(output_dir / "ppo_bipedal_walker_clip.png", dpi=150, bbox_inches="tight")
+    plt.close()
+    print("  裁剪比例曲线 → output/ppo_bipedal_walker_clip.png")
 
-# 子图4：近似 KL 散度
-ax4 = axes[1, 1]
+# 图4：近似 KL 散度
 if callback.approx_kl_list:
-    ax4.plot(callback.timesteps_list, callback.approx_kl_list,
-             color="#4CAF50", alpha=0.8, linewidth=1.5)
-    ax4.set_title("近似 KL 散度（新旧策略差异）", fontsize=13)
-    ax4.set_xlabel("时间步")
-    ax4.set_ylabel("KL 散度")
-    ax4.grid(True, alpha=0.3)
-
-plt.tight_layout()
-plt.savefig("output/ppo_bipedal_walker_curves.png", dpi=150, bbox_inches="tight")
-print("训练曲线已保存至: output/ppo_bipedal_walker_curves.png")
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.plot(callback.timesteps_list, callback.approx_kl_list,
+            color="#4CAF50", alpha=0.8, linewidth=1.5)
+    ax.set_title("PPO BipedalWalker-v3 近似 KL 散度", fontsize=14, fontweight="bold")
+    ax.set_xlabel("时间步")
+    ax.set_ylabel("KL 散度")
+    ax.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(output_dir / "ppo_bipedal_walker_kl.png", dpi=150, bbox_inches="tight")
+    plt.close()
+    print("  KL 散度曲线 → output/ppo_bipedal_walker_kl.png")
 
 
 # ==========================================

@@ -1,16 +1,16 @@
-# 信任域与裁剪
+# 7.3 信任域与裁剪
 
-前面我们跑通了 PPO 的 LunarLander 实验，也推导了裁剪代理目标的数学形式（回顾：[PPO 数学推导](./ppo-math)）。但一个核心问题还没回答：裁剪机制到底在保护什么？为什么简单的策略梯度会崩溃？这一切要从"策略更新的危险性"说起。
+前面我们已经在 BipedalWalker 中看到了 PPO 的训练曲线，也推导了裁剪代理目标的数学形式（回顾：[PPO 数学推导](./ppo-math)）。但一个核心问题还没回答：裁剪机制到底在保护什么？为什么简单的策略梯度会崩溃？这一切要从"策略更新的危险性"说起。
 
 ::: tip 本节前置知识
 
-- [策略梯度更新公式](../chapter05_policy_gradient/policy-gradient)——裁剪要保护的正是这个更新
+- [策略梯度更新公式](../chapter05_policy_gradient/reinforce)——裁剪要保护的正是这个更新
 - [优势函数 $A(s,a)$](../chapter06_actor_critic/advantage-function)——策略更新的方向信号
   :::
 
 ## 朴素策略梯度的不稳定性
 
-回顾第 5 章的[策略梯度更新公式](../chapter05_policy_gradient/policy-gradient)：
+回顾第 5 章的[策略梯度更新公式](../chapter05_policy_gradient/reinforce)：
 
 $$\theta \leftarrow \theta + \alpha \cdot \nabla_\theta \log \pi_\theta(a|s) \cdot A(s,a)$$
 

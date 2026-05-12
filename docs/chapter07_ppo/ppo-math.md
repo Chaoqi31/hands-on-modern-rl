@@ -1,4 +1,4 @@
-# PPO 数学推导
+# 7.2 PPO 数学推导
 
 上一节我们用 SB3 的 PPO 训练了月球着陆器，看到了 reward、entropy、clip fraction 这些曲线。接下来要回答一个更基础的问题：**PPO 到底是什么？为什么它最后会写成一个 loss？**
 
@@ -6,7 +6,7 @@
 本节是对第 5-6 章内容的整合与延伸，以下概念会在推导中反复出现：
 
 - [策略目标 $J(\theta)$](../chapter03_mdp/policy-objective)——PPO 要最大化的对象
-- [策略梯度定理](../chapter05_policy_gradient/policy-gradient)——PPO 的推导起点
+- [策略梯度定理](../chapter05_policy_gradient/reinforce)——PPO 的推导起点
 - [优势函数 $A(s,a)$](../chapter06_actor_critic/advantage-function)——替代 $G_t$ 的低方差信号
 - [Critic 训练](../chapter06_actor_critic/critic-training)——价值函数损失的理论来源
 - [折扣累积回报 $G_t$](../chapter03_mdp/mdp)——从单步奖励到长期目标
@@ -341,7 +341,7 @@ optimizer.step()
 
 ## 第四步：价值函数、基线与优势
 
-朴素 REINFORCE 能工作，但**方差很大**（回顾：[REINFORCE 的致命缺陷](../chapter05_policy_gradient/policy-gradient)）。原因是 $G_t$ 只是告诉我们”这次后面总共拿了多少奖励”，却没有告诉我们”这在当前状态下算不算好”。
+朴素 REINFORCE 能工作，但**方差很大**（回顾：[REINFORCE 的致命缺陷](../chapter05_policy_gradient/reinforce)）。原因是 $G_t$ 只是告诉我们”这次后面总共拿了多少奖励”，却没有告诉我们”这在当前状态下算不算好”。
 
 例如 LunarLander 某一步之后拿到 $G_t=80$。这听起来不错，但如果同一个状态下正常策略平均能拿 $120$，那这个动作其实低于平均水平。我们需要一个参照物，这个参照物就是[状态价值函数](../chapter03_mdp/value-bellman)：
 
@@ -384,7 +384,7 @@ $$
 
 如果不用 GAE，最朴素的近似就是 `advantages = returns - values`。本章代码使用 GAE 来算 `advantages`，下一节会专门推导 GAE。这里先把它理解成“比 Critic 预期更好或更差的那部分”。
 
-为什么可以把 $G_t$ 换成 $A_t$？因为从策略梯度里减去一个只依赖状态的基线 $b(s_t)$，不会改变期望梯度（回顾：[基线实验](../chapter05_policy_gradient/baseline-experiment)的数学解释）：
+为什么可以把 $G_t$ 换成 $A_t$？因为从策略梯度里减去一个只依赖状态的基线 $b(s_t)$，不会改变期望梯度（回顾：[基线降方差](../chapter05_policy_gradient/pg-improvements)的数学解释）：
 
 $$
 \mathbb{E}_{a_t\sim\pi_\theta}

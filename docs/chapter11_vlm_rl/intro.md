@@ -54,6 +54,7 @@
 | [11.2 视觉奖励与幻觉](./vlm-challenges)                 | 视觉 token 的奖励怎么分配？视觉幻觉怎么应对？         |
 | [11.3 VLM RL 框架与前沿](./vlm-frameworks)              | VisPlay、VISTA-Gym、多模态 Agent 等框架怎么工作？     |
 | [11.4 视觉生成模型的 RL 后训练](./visual-generation-rl) | Diffusion/视频生成怎么用 RL 优化？Reward 怎么设计？   |
+| [11.5 动手：用 EasyR1 训练 GeoQA](./easyr1-geoqa)       | 工业框架 + 真实数据集，跑一次完整的 VLM GRPO 训练     |
 
 ## 学习目标
 

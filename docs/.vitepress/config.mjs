@@ -842,19 +842,27 @@ const zhSidebar = {
               link: '/chapter10_agentic_rl/industrial-evaluation'
             },
             {
-              text: '10.4 动手：rLLM DeepCoder',
+              text: '10.4 Agent 数据制造',
+              link: '/chapter10_agentic_rl/agent-data-swe-smith'
+            },
+            {
+              text: '10.5 动手：rLLM DeepCoder',
               link: '/chapter10_agentic_rl/rllm-deepcoder-lab'
             },
             {
-              text: '10.5 Deep Research',
+              text: '10.6 动手：金融 Agent',
+              link: '/chapter10_agentic_rl/rllm-finqa-lab'
+            },
+            {
+              text: '10.7 Deep Research',
               link: '/chapter10_agentic_rl/deep-research-agent'
             },
             {
-              text: '10.6 实现训练系统',
+              text: '10.8 实现训练系统',
               link: '/chapter10_agentic_rl/build-agentic-training-system'
             },
             {
-              text: '10.7 延伸阅读',
+              text: '10.9 延伸阅读',
               link: '/chapter10_agentic_rl/extended-readings'
             }
           ]

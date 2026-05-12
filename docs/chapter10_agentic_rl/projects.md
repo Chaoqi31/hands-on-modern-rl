@@ -4,7 +4,7 @@ search: false
 
 # 旧页：项目实践（已拆分为两个项目页）
 
-> 这一页保留为旧链接入口。核心内容已经拆分为 [10.4 多工具 Code Agent](./multi-tool-code-agent) 和 [10.5 Deep Research Agent](./deep-research-agent)。下面保留原文，方便从旧链接进入的读者对照。
+> 这一页保留为旧链接入口。核心内容已经迁移至 [10.4 rLLM DeepCoder 实验](./rllm-deepcoder-lab) 和 [10.5 Deep Research Agent](./deep-research-agent)。下面保留原文，方便从旧链接进入的读者对照。
 
 # 项目一：多工具 Agentic RL——搜索文档、写代码、跑测试
 
