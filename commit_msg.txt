@@ -1,8 +1,0 @@
-chore(assets): upgrade Search-R1 diagrams to high-resolution versions
-
-This commit updates the Search-R1 architecture and multi-turn diagrams in Chapter 10 to significantly higher quality/resolution versions to improve readability and visual presentation.
-
-Specific changes:
-- Upgraded `searchr1_arch.png` and `searchr1_arch.webp` to high-resolution assets, providing much better detail for the system architecture flow.
-- Upgraded `searchr1_multiturn.png` and `searchr1_multiturn.webp` to high-resolution assets, making the text in the multi-turn reasoning examples much clearer.
-- Removed the redundant `searchr1_arch_orig.png` backup file to keep the image directory tidy and reduce repository bloat.
