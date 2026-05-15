@@ -19,6 +19,8 @@ const assetDir = path.join(workDir, 'assets')
 const distDir = path.join(docsDir, '.vitepress', 'dist')
 const texPath = path.join(workDir, 'book.tex')
 
+const pdfLocale = String(process.env.PDF_LOCALE || 'zh').toLowerCase()
+const isEnglishPdf = pdfLocale === 'en'
 const pdfVersion = process.env.PDF_VERSION || '0.1.0'
 const pdfVersionLabel = versionLabel(pdfVersion)
 const sourcePageLimit = Math.max(0, readNumberArg('--limit', 18))
@@ -54,19 +56,36 @@ const pdfOptimize = !['0', 'false', 'no', 'off'].includes(
 )
 const pdfOptimizeProfile = process.env.PDF_OPTIMIZE_PROFILE || 'default'
 const pdfEnglishTitle = process.env.PDF_ENGLISH_TITLE || 'Hands-On Modern RL'
-const pdfChineseTitle = process.env.PDF_CHINESE_TITLE || '现代强化学习实战'
+const pdfChineseTitle =
+  process.env.PDF_CHINESE_TITLE ||
+  (isEnglishPdf
+    ? 'Modern Reinforcement Learning in Practice'
+    : '现代强化学习实战')
 const pdfBookTitle =
-  process.env.PDF_BOOK_TITLE || `${pdfEnglishTitle}：${pdfChineseTitle}`
-const pdfSubtitle = process.env.PDF_SUBTITLE || '从可运行代码到强化学习原理'
+  process.env.PDF_BOOK_TITLE ||
+  (isEnglishPdf
+    ? 'Hands-On Modern RL'
+    : `${pdfEnglishTitle}：${pdfChineseTitle}`)
+const pdfSubtitle =
+  process.env.PDF_SUBTITLE ||
+  (isEnglishPdf
+    ? 'Modern Reinforcement Learning in Practice — From Code to Theory'
+    : '从可运行代码到强化学习原理')
 const pdfTagline =
   process.env.PDF_TAGLINE ||
-  '开放教材 · 书籍版 PDF：涵盖经典控制、LLM 后训练、RLVR 与多模态智能体。'
+  (isEnglishPdf
+    ? 'Open textbook PDF: classic control, LLM post-training, RLVR, Agentic RL, and multimodal agents.'
+    : '开放教材 · 书籍版 PDF：涵盖经典控制、LLM 后训练、RLVR 与多模态智能体。')
 const pdfCoverMission =
   process.env.PDF_COVER_MISSION ||
-  '我们希望更多人都有向 AGI 上限发起挑战的勇气、可能性和能力，这会让我们能够解决更多人无法解决的疑难问题，始终相信技术应该让生活更美好。'
+  (isEnglishPdf
+    ? 'We want more learners to have the courage, possibility, and capability to push toward the frontier of intelligent systems, while keeping the belief that technology should make life better.'
+    : '我们希望更多人都有向 AGI 上限发起挑战的勇气、可能性和能力，这会让我们能够解决更多人无法解决的疑难问题，始终相信技术应该让生活更美好。')
 const pdfOnlineUrl =
   process.env.PDF_ONLINE_URL ||
-  'https://walkinglabs.github.io/hands-on-modern-rl/'
+  (isEnglishPdf
+    ? 'https://walkinglabs.github.io/hands-on-modern-rl/en/'
+    : 'https://walkinglabs.github.io/hands-on-modern-rl/')
 const pdfLicenseName =
   process.env.PDF_LICENSE_NAME ||
   'Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)'
@@ -186,7 +205,7 @@ function escapeLatexUrl(value) {
 }
 
 function normalizePdfSymbols(value) {
-  return String(value)
+  let output = String(value)
     .replace(/🖼️/g, '图片')
     .replace(/⚠️/g, '注意')
     .replace(/\uFE0F/g, '')
@@ -208,6 +227,23 @@ function normalizePdfSymbols(value) {
     .replace(/🔵/g, '蓝色')
     .replace(/⋮/g, '...')
     .replace(/\bStar\s+Star\b/g, 'Star')
+
+  if (isEnglishPdf) {
+    output = output
+      .replace(/图片/g, 'Image')
+      .replace(/注意/g, 'Note')
+      .replace(/目录/g, 'Contents')
+      .replace(/启动/g, 'Start')
+      .replace(/完成/g, 'Done')
+      .replace(/未通过/g, 'Failed')
+      .replace(/查看/g, 'View')
+      .replace(/赞成/g, 'Approve')
+      .replace(/反对/g, 'Reject')
+      .replace(/红色/g, 'Red')
+      .replace(/蓝色/g, 'Blue')
+  }
+
+  return output
 }
 
 function warnOnce(message) {
@@ -256,7 +292,9 @@ function protectLatexTokens() {
 }
 
 function normalizeLatexMath(value) {
-  return String(value).replace(/\\\*/g, '*')
+  return String(value)
+    .replace(/\\\\([A-Za-z])/g, (match, commandStart) => `\\${commandStart}`)
+    .replace(/\\\*/g, '*')
 }
 
 function renderHref(label, target) {
@@ -384,19 +422,34 @@ function renderContainerTitle(kind, rawTitle = '') {
   const title = stripMarkdown(normalizeInlineHtml(rawTitle)).trim()
   const normalizedKind = String(kind || '').toLowerCase()
 
-  if (normalizedKind === 'code-group') return '代码组'
+  if (normalizedKind === 'code-group')
+    return isEnglishPdf ? 'Code group' : '代码组'
   if (title && !/^note$/i.test(title)) return title
 
-  const fallbackTitles = {
-    info: '说明',
-    note: '说明',
-    tip: '提示',
-    warning: '注意',
-    danger: '警告',
-    details: '补充说明'
-  }
+  const fallbackTitles = isEnglishPdf
+    ? {
+        info: 'Info',
+        note: 'Note',
+        tip: 'Tip',
+        warning: 'Warning',
+        danger: 'Warning',
+        details: 'Details'
+      }
+    : {
+        info: '说明',
+        note: '说明',
+        tip: '提示',
+        warning: '注意',
+        danger: '警告',
+        details: '补充说明'
+      }
 
-  return fallbackTitles[normalizedKind] || title || normalizedKind || '说明'
+  return (
+    fallbackTitles[normalizedKind] ||
+    title ||
+    normalizedKind ||
+    (isEnglishPdf ? 'Note' : '说明')
+  )
 }
 
 function renderList(lines, ordered) {
@@ -489,10 +542,16 @@ function renderMermaidBlock(lines) {
     ].join('\n')
   }
 
-  warnOnce('无法渲染 Mermaid 图，已在正文中保留静态说明。')
+  warnOnce(
+    isEnglishPdf
+      ? 'Unable to render a Mermaid diagram; kept a static note in the PDF.'
+      : '无法渲染 Mermaid 图，已在正文中保留静态说明。'
+  )
   return [
-    '\\begin{BookNote}{图示}',
-    '这里原文包含一张 Mermaid 流程图；构建环境未能完成预渲染，PDF 中暂以文字说明保留位置。',
+    `\\begin{BookNote}{${isEnglishPdf ? 'Diagram' : '图示'}}`,
+    isEnglishPdf
+      ? 'The source page contains a Mermaid diagram. The build environment could not prerender it, so this PDF keeps a textual placeholder.'
+      : '这里原文包含一张 Mermaid 流程图；构建环境未能完成预渲染，PDF 中暂以文字说明保留位置。',
     '\\end{BookNote}\n'
   ].join('\n')
 }
@@ -518,8 +577,10 @@ function renderImage(sourceFile, alt, target) {
 
   if (!resolved) {
     return [
-      '\\begin{BookNote}{图略}',
-      `${label}。外部或暂不支持的图片资源：\\url{${escapeLatexUrl(target)}}`,
+      `\\begin{BookNote}{${isEnglishPdf ? 'Image omitted' : '图略'}}`,
+      isEnglishPdf
+        ? `${label}. External or unsupported image resource: \\url{${escapeLatexUrl(target)}}`
+        : `${label}。外部或暂不支持的图片资源：\\url{${escapeLatexUrl(target)}}`,
       '\\end{BookNote}\n'
     ].join('\n')
   }
@@ -527,8 +588,10 @@ function renderImage(sourceFile, alt, target) {
   const copied = copyAsset(resolved)
   if (!copied) {
     return [
-      '\\begin{BookNote}{图略}',
-      `${label}。暂不支持直接嵌入该图片格式：\\texttt{${escapeLatex(path.basename(resolved))}}`,
+      `\\begin{BookNote}{${isEnglishPdf ? 'Image omitted' : '图略'}}`,
+      isEnglishPdf
+        ? `${label}. This image format cannot be embedded directly yet: \\texttt{${escapeLatex(path.basename(resolved))}}`
+        : `${label}。暂不支持直接嵌入该图片格式：\\texttt{${escapeLatex(path.basename(resolved))}}`,
       '\\end{BookNote}\n'
     ].join('\n')
   }
@@ -611,10 +674,14 @@ function isDisplayMathBoundary(line) {
 }
 
 function renderCustomComponent(line) {
-  const name = line.match(/^<\/?([A-Z][A-Za-z0-9_:-]*)/)?.[1] || '组件'
+  const name =
+    line.match(/^<\/?([A-Z][A-Za-z0-9_:-]*)/)?.[1] ||
+    (isEnglishPdf ? 'component' : '组件')
   return [
-    '\\begin{BookNote}{交互组件}',
-    `原网页这里包含 ${renderInline(name)} 交互组件。PDF 书籍版保留静态说明；需要运行交互演示时，请回到在线版本或仓库源码。`,
+    `\\begin{BookNote}{${isEnglishPdf ? 'Interactive component' : '交互组件'}}`,
+    isEnglishPdf
+      ? `The web page contains an interactive ${renderInline(name)} component here. The PDF keeps a static note; use the online version or repository source for interactive demos.`
+      : `原网页这里包含 ${renderInline(name)} 交互组件。PDF 书籍版保留静态说明；需要运行交互演示时，请回到在线版本或仓库源码。`,
     '\\end{BookNote}\n'
   ].join('\n')
 }
@@ -988,6 +1055,44 @@ function hasUsableFile(filePath) {
   }
 }
 
+function detectRasterFormat(filePath) {
+  let header
+  try {
+    header = fs.readFileSync(filePath, { length: 16 })
+  } catch {
+    return null
+  }
+
+  if (
+    header
+      .subarray(0, 8)
+      .equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))
+  ) {
+    return 'png'
+  }
+  if (header.subarray(0, 3).equals(Buffer.from([0xff, 0xd8, 0xff]))) {
+    return 'jpeg'
+  }
+  if (header.subarray(0, 4).toString('ascii') === '%PDF') {
+    return 'pdf'
+  }
+  if (
+    header.subarray(0, 4).toString('ascii') === 'RIFF' &&
+    header.subarray(8, 12).toString('ascii') === 'WEBP'
+  ) {
+    return 'webp'
+  }
+  if (header.subarray(0, 3).toString('ascii') === 'GIF') {
+    return 'gif'
+  }
+  if (header.subarray(4, 8).toString('ascii') === 'ftyp') {
+    const brand = header.subarray(8, 12).toString('ascii')
+    if (brand === 'avif' || brand === 'avis') return 'avif'
+  }
+
+  return null
+}
+
 function renderBookAsset(mode, inputPath, outputPath) {
   if (!fs.existsSync(renderBookAssetScriptPath)) return false
 
@@ -1058,7 +1163,20 @@ function copyAsset(sourcePath) {
   const assetStem = `asset-${String(assetCount).padStart(4, '0')}`
   let targetPath = null
 
-  if (['.png', '.jpg', '.jpeg', '.pdf'].includes(ext)) {
+  const rasterFormat = detectRasterFormat(sourcePath)
+
+  if (['webp', 'gif', 'avif'].includes(rasterFormat)) {
+    targetPath = path.join(assetDir, `${assetStem}.png`)
+    if (!convertAnimatedOrWebAsset(sourcePath, targetPath)) {
+      warnOnce(
+        `${isEnglishPdf ? 'Unable to convert image to PNG; keeping a placeholder in the body' : '无法把图片转换为 PNG，已在正文中保留占位'}：${path.relative(
+          rootDir,
+          sourcePath
+        )}`
+      )
+      return null
+    }
+  } else if (['.png', '.jpg', '.jpeg', '.pdf'].includes(ext)) {
     targetPath = path.join(assetDir, `${assetStem}${ext}`)
     fs.copyFileSync(sourcePath, targetPath)
   } else if (['.gif', '.webp', '.avif'].includes(ext)) {
@@ -1178,7 +1296,7 @@ function collectBookStructure(sidebar) {
   for (const section of sidebar || []) {
     chunks.push({
       type: 'part',
-      title: section.text || '未命名部分'
+      title: section.text || (isEnglishPdf ? 'Untitled Part' : '未命名部分')
     })
 
     if (section.link) visitItem(section)
@@ -1220,11 +1338,15 @@ function renderChapterIntro(chapter) {
 
   const label =
     chapter.kind === 'appendix'
-      ? `附录 ${chapter.number}`
-      : `第 ${chapter.number} 章`
+      ? isEnglishPdf
+        ? `Appendix ${chapter.number}`
+        : `附录 ${chapter.number}`
+      : isEnglishPdf
+        ? `Chapter ${chapter.number}`
+        : `第 ${chapter.number} 章`
   return [
     `\\BookChapter{${renderInline(chapter.title)}}{${renderInline(label)}}{`,
-    '本章导读',
+    isEnglishPdf ? 'Chapter Guide' : '本章导读',
     '}{',
     pageList,
     '}\n'
@@ -1237,11 +1359,17 @@ function renderPage(page, chapter = null) {
 
   if (!fs.existsSync(page.filePath)) {
     lines.push(`\\section{${renderInline(title)}}`)
-    lines.push('\\begin{BookNote}{缺失页面}')
     lines.push(
-      `Sidebar 中包含该页面，但本地没有找到对应 Markdown 文件：\\texttt{${escapeLatex(
-        path.relative(rootDir, page.filePath)
-      )}}`
+      `\\begin{BookNote}{${isEnglishPdf ? 'Missing page' : '缺失页面'}}`
+    )
+    lines.push(
+      isEnglishPdf
+        ? `The sidebar contains this page, but no matching Markdown file was found locally: \\texttt{${escapeLatex(
+            path.relative(rootDir, page.filePath)
+          )}}`
+        : `Sidebar 中包含该页面，但本地没有找到对应 Markdown 文件：\\texttt{${escapeLatex(
+            path.relative(rootDir, page.filePath)
+          )}}`
     )
     lines.push('\\end{BookNote}\n')
     return lines.join('\n')
@@ -1374,7 +1502,7 @@ function latexPreamble() {
 \renewcommand{\bottomfraction}{0.95}
 \renewcommand{\textfraction}{0.05}
 \renewcommand{\floatpagefraction}{0.95}
-\renewcommand{\contentsname}{目录}
+\renewcommand{\contentsname}{${isEnglishPdf ? 'Contents' : '目录'}}
 \renewcommand{\figurename}{图}
 \renewcommand{\tablename}{表}
 \renewcommand{\arraystretch}{1.18}
@@ -1383,7 +1511,7 @@ function latexPreamble() {
 \def\@makechapterhead#1{%
   \vspace*{20pt}%
   {\parindent \z@ \raggedright \normalfont
-    {\Large\color{BookMuted}\bfseries 第 \thechapter 章\par}%
+    {\Large\color{BookMuted}\bfseries ${isEnglishPdf ? 'Chapter' : '第'} \thechapter ${isEnglishPdf ? '' : '章'}\par}%
     \vspace{10pt}%
     {\Huge\bfseries #1\par}%
     \vspace{16pt}%
@@ -1443,7 +1571,7 @@ function latexPreamble() {
   \vspace{5mm}
   {\large\bfseries #3\par}
   \vspace{2mm}
-  本章包含以下小节，建议先扫一遍结构，再进入正文和代码。
+  ${isEnglishPdf ? 'This chapter contains the following sections. Skim the structure first, then move into the prose and code.' : '本章包含以下小节，建议先扫一遍结构，再进入正文和代码。'}
   \begin{itemize}
   #4
   \end{itemize}
@@ -1453,6 +1581,16 @@ function latexPreamble() {
 }
 
 function renderTitlePage(logoAsset) {
+  const openCourseLabel = isEnglishPdf
+    ? 'Open Course · Book PDF'
+    : '开放课程 · 书籍版 PDF'
+  const authorLabel = isEnglishPdf ? 'Authors' : '作者'
+  const repoLabel = isEnglishPdf ? 'Repository' : '仓库'
+  const versionLabelText = isEnglishPdf ? 'Version' : '版本'
+  const coverNote = isEnglishPdf
+    ? 'This book is compiled by WalkingLabs Open Course Series as a versioned, citable PDF for offline reading and classroom use.'
+    : '本书由 WalkingLabs 开放课程整理为可离线阅读、可引用、可持续修订的书籍版 PDF。'
+
   return [
     '\\begin{titlepage}',
     '\\thispagestyle{empty}',
@@ -1466,7 +1604,7 @@ function renderTitlePage(logoAsset) {
     `{\\Huge\\bfseries ${renderInline(pdfEnglishTitle)}}\\\\[5mm]`,
     `{\\LARGE ${renderInline(pdfChineseTitle)}}\\\\[3mm]`,
     `{\\large ${renderInline(pdfSubtitle)}}\\\\[8mm]`,
-    '{\\large 开放课程 · 书籍版 PDF}\\\\[4mm]',
+    `{\\large ${renderInline(openCourseLabel)}}\\\\[4mm]`,
     `{\\large Version ${renderInline(pdfVersion)} · ${renderInline(
       pdfBuildDate
     )}}\\\\[12mm]`,
@@ -1476,18 +1614,20 @@ function renderTitlePage(logoAsset) {
     '\\end{center}',
     '\\vfill',
     '\\noindent\\rule{\\textwidth}{0.4pt}\\\\[4mm]',
-    `\\noindent\\textbf{作者} \\quad ${renderAuthors()}\\\\[3mm]`,
-    `\\noindent\\textbf{仓库} \\quad \\href{${escapeLatexUrl(
+    `\\noindent\\textbf{${renderInline(authorLabel)}} \\quad ${renderAuthors()}\\\\[3mm]`,
+    `\\noindent\\textbf{${renderInline(repoLabel)}} \\quad \\href{${escapeLatexUrl(
       pdfGithubUrl
     )}}{${renderInline(pdfGithubUrl)}}\\\\[3mm]`,
-    `\\noindent\\textbf{版本} \\quad ${renderInline(pdfVersion)}\\\\[8mm]`,
-    '\\noindent 本书由 WalkingLabs 开放课程整理为可离线阅读、可引用、可持续修订的书籍版 PDF。\\\\[2mm]',
+    `\\noindent\\textbf{${renderInline(versionLabelText)}} \\quad ${renderInline(pdfVersion)}\\\\[8mm]`,
+    `\\noindent ${renderInline(coverNote)}\\\\[2mm]`,
     `\\noindent{\\small\\color{BookMuted} ${renderInline(pdfCoverMission)}}`,
     '\\end{titlepage}'
   ].join('\n')
 }
 
 function renderFrontMatter(pageCount) {
+  if (isEnglishPdf) return renderEnglishFrontMatter(pageCount)
+
   return [
     '\\frontmatter',
     '\\chapter*{版权与版本}',
@@ -1595,9 +1735,123 @@ function renderFrontMatter(pageCount) {
   ].join('\n')
 }
 
+function renderEnglishFrontMatter(pageCount) {
+  return [
+    '\\frontmatter',
+    '\\chapter*{Copyright and Version}',
+    '\\phantomsection\\addcontentsline{toc}{chapter}{Copyright and Version}',
+    '\\section*{Publication Information}',
+    `\\noindent\\textbf{Title} \\quad ${renderInline(
+      `${pdfBookTitle}: ${pdfSubtitle}`
+    )}\\\\[2mm]`,
+    `\\noindent\\textbf{Version} \\quad ${renderInline(pdfVersion)}\\\\[2mm]`,
+    `\\noindent\\textbf{Build Date} \\quad ${renderInline(
+      pdfBuildDate
+    )}\\\\[2mm]`,
+    `\\noindent\\textbf{Authors} \\quad ${renderAuthors()}\\\\[2mm]`,
+    `\\noindent\\textbf{Repository} \\quad \\href{${escapeLatexUrl(
+      pdfGithubUrl
+    )}}{${renderInline(pdfGithubUrl)}}\\\\[2mm]`,
+    `\\noindent\\textbf{Online Version} \\quad \\href{${escapeLatexUrl(
+      pdfOnlineUrl
+    )}}{${renderInline(pdfOnlineUrl)}}`,
+    '',
+    '\\section*{License}',
+    'Copyright \\copyright{} 2026 WalkingLabs and contributors.',
+    '',
+    `Unless otherwise noted on a page, image, or code snippet, the original course text and figures are released under \\href{${escapeLatexUrl(
+      pdfLicenseUrl
+    )}}{${renderInline(pdfLicenseName)}}. You may copy, distribute, and adapt this material for non-commercial purposes, provided that attribution is preserved, changes are indicated, and derivative works are shared under the same license.`,
+    '',
+    'Third-party images, paper screenshots, external links, quoted text, trademarks, and some code examples may be governed by their original licenses. Please follow the corresponding source license and citation requirements when using them.',
+    '',
+    '\\section*{Suggested Citation}',
+    'If you use this book in courses, notes, research discussions, or derivative non-commercial educational materials, please cite the repository and keep the version number.',
+    '',
+    '\\noindent\\textbf{APA-style}',
+    `\\begin{quote}\\small WalkingLabs. (2026). \\emph{${renderInline(
+      `${pdfBookTitle}: ${pdfSubtitle}`
+    )}} (Version ${renderInline(
+      pdfVersion
+    )}) [Open courseware]. \\href{${escapeLatexUrl(
+      pdfGithubUrl
+    )}}{\\nolinkurl{${escapeLatexUrl(pdfGithubUrl)}}}.\\end{quote}`,
+    '',
+    '\\noindent\\textbf{BibTeX}',
+    '\\begin{Verbatim}[fontsize=\\scriptsize,frame=single,framesep=1.2mm]',
+    '@misc{hands_on_modern_rl,',
+    `  title        = {${pdfBookTitle}: ${pdfSubtitle}},`,
+    '  author       = {WalkingLabs},',
+    '  year         = {2026},',
+    `  howpublished = {\\url{${escapeLatexUrl(pdfGithubUrl)}}},`,
+    `  note         = {Open courseware repository, Version ${pdfVersion}},`,
+    '}',
+    '\\end{Verbatim}',
+    '',
+    '\\section*{Errata and Updates}',
+    'This PDF is generated from the README and course sidebar structure for offline reading, classroom distribution, and versioned citation. The online site and repository will continue to evolve. If the PDF, website, and repository source differ, treat the latest GitHub repository content as authoritative. Please use GitHub Issues for errata, additions, and improvement suggestions.',
+    '',
+    '\\section*{Disclaimer}',
+    'This book is provided as-is, without warranties of any kind. Reinforcement learning experiments can depend on package versions, hardware, random seeds, and external model services. Validate results before relying on them in your own systems.',
+    '',
+    '\\chapter*{Preface}',
+    '\\phantomsection\\addcontentsline{toc}{chapter}{Preface}',
+    `${pdfBookTitle} is an open course for modern reinforcement learning practice. Instead of starting with formulas and hiding the system behind black-box APIs, this course follows a practice-first path: begin with runnable code, training curves, and failure cases, then return to the mathematical structures underneath them.`,
+    '',
+    "The course moves from classic control to today's frontier: LLM post-training, preference alignment, DPO and GRPO, RL with verifiable rewards, multi-turn tool-use agents, Agentic RL, VLM reinforcement learning, embodied intelligence, and multi-agent self-play.",
+    '',
+    'The goal is to build a steady ladder: from solving CartPole to understanding and building post-training and agent systems.',
+    '',
+    'This open textbook is still evolving. Stable chapters are ready for focused reading; chapters marked as under construction may still contain mistakes. Contributions through GitHub Issues and Pull Requests are welcome.',
+    '',
+    'This book is especially suitable for:',
+    '',
+    '\\begin{itemize}',
+    '\\item machine learning engineers moving from supervised learning into reinforcement learning;',
+    '\\item researchers and students preparing to read modern RL, LLM alignment, and Agentic RL papers;',
+    '\\item LLM practitioners who want to understand RLHF, DPO, GRPO, RLVR, and post-training systems;',
+    '\\item self-learners who prefer to see code, experiments, and visualizations before formulas.',
+    '\\end{itemize}',
+    '',
+    'If this is your first encounter with reinforcement learning, start from CartPole and PPO, and treat formulas as explanations for experimental behavior. If you already know classic RL, you can jump into DPO, GRPO, RLVR, and Agentic RL, then return to the appendices for mathematical details.',
+    '',
+    '\\chapter*{Edition Notes}',
+    '\\phantomsection\\addcontentsline{toc}{chapter}{Edition Notes}',
+    '\\subsection*{Learning Goals}',
+    'After completing this course, learners should be able to:',
+    '\\begin{itemize}',
+    '\\item implement and explain the core RL loop: environment interaction, trajectory collection, reward feedback, policy update, and evaluation;',
+    '\\item connect MDPs, value functions, Bellman equations, TD learning, policy gradients, and advantage estimation to concrete training behavior;',
+    '\\item read and modify DQN, REINFORCE, Actor-Critic, PPO, DPO, GRPO, and related implementations;',
+    '\\item reason about LLM post-training pipelines, including SFT, reward modeling, PPO-style RLHF, DPO-family methods, and RLVR;',
+    '\\item understand multi-turn interaction and credit assignment, and build tool-use, trajectory-synthesis, and Agentic RL systems;',
+    '\\item extend reinforcement learning ideas to VLMs, embodied intelligence, and multi-agent self-play;',
+    '\\item diagnose common RL failure modes and design reasonable algorithms, engineering evaluations, and debugging workflows for new RL problems.',
+    '\\end{itemize}',
+    '',
+    `This edition compiles ${pageCount} course pages with a cover, preface, contents, PDF bookmarks, chapter opening pages, headers, footers, page numbers, and clickable repository metadata.`,
+    '',
+    'For book-style reading, the build script processes animated images, SVGs, Mermaid diagrams, footnotes, tables, local references, and navigation links. Interactive web components are converted to static notes in the PDF; use the online version or repository source to run interactive demos.',
+    '',
+    '\\cleardoublepage',
+    '\\phantomsection',
+    '\\pdfbookmark[0]{Contents}{toc}',
+    '\\tableofcontents',
+    '\\mainmatter'
+  ].join('\n')
+}
+
 async function loadSidebar() {
   const configModule = await import(pathToFileURL(configPath).href)
   const config = configModule.default
+  if (isEnglishPdf) {
+    return (
+      config.locales?.en?.themeConfig?.sidebar?.['/en/'] ||
+      config.locales?.en?.themeConfig?.sidebar?.['/'] ||
+      []
+    )
+  }
+
   return (
     config.locales?.zh?.themeConfig?.sidebar?.['/'] ||
     config.themeConfig?.sidebar?.['/'] ||

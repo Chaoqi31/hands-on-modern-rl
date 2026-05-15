@@ -932,7 +932,7 @@ $$L^{\text{CLIP}}(\theta) = \mathbb{E}_t \left[ \min \left( r_t(\theta) \cdot A_
 
 For $A_t>0$, $\min(r_t \cdot A_t, A_t)$: when $r_t>1$, the objective is the constant $A_t$, so further increasing a good action's probability no longer improves the objective; when $r_t<1$, the objective is $r_t\cdot A_t$ and the gradient only pushes it back toward 1. This means good actions cannot be meaningfully increased above the old policy.
 
-For $A_t<0$, $\min(r_t \cdot A_t, A_t)$: when $r_t<1$, the objective is the constant $A_t$, so further decreasing a bad action's probability no longer improves the objective; when $r_t>1$, the objective is $r_t\cdot A_t$ and the gradient only pushes it back toward 1. This means bad actions cannot be meaningfully decreased below the old policy either.
+For $A_t < 0$, $\min(r_t \cdot A_t, A_t)$: when $r_t < 1$, the objective is the constant $A_t$, so further decreasing a bad action's probability no longer improves the objective; when $r_t > 1$, the objective is $r_t\cdot A_t$ and the gradient only pushes it back toward 1. This means bad actions cannot be meaningfully decreased below the old policy either.
 
 In short, $\varepsilon=0$ almost freezes the policy near the old one: whether advantages are positive or negative, the policy cannot make meaningful improvements. This shows $\varepsilon$ controls both "allowed change magnitude" and "learning capacity."
 
@@ -943,7 +943,7 @@ In short, $\varepsilon=0$ almost freezes the policy near the old one: whether ad
 
 Clipping effectively limits policy change in most situations, but it has a theoretical weakness: it constrains the ratio $r_t$ for each **individual** action, rather than directly constraining the overall distribution distance (KL divergence) between two policies.
 
-Consider an extreme case: a policy has 100 actions, and clipping allows each action probability to change by $\pm 20\\%$. If all actions are pushed to the boundary simultaneously, the overall distribution change can exceed a KL constraint such as $\delta=0.01$. In practice, this is rare because advantage estimates are noisy and usually do not push all actions in extreme directions simultaneously. But for settings where policy-change control must be strict (e.g., LLM alignment), practitioners often monitor KL as an additional safety metric. This is why in Chapter 8's RLHF training you will see both `clip_fraction` and `approx_kl` logged.
+Consider an extreme case: a policy has 100 actions, and clipping allows each action probability to change by $\pm 20\%$. If all actions are pushed to the boundary simultaneously, the overall distribution change can exceed a KL constraint such as $\delta=0.01$. In practice, this is rare because advantage estimates are noisy and usually do not push all actions in extreme directions simultaneously. But for settings where policy-change control must be strict (e.g., LLM alignment), practitioners often monitor KL as an additional safety metric. This is why in Chapter 8's RLHF training you will see both `clip_fraction` and `approx_kl` logged.
 
 </details>
 

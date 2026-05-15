@@ -23,10 +23,13 @@ jobs:
           tag="${GITHUB_REF_NAME}"
           version="${tag#v}"
           asset_name="hands-on-modern-rl-open-textbook-v${version}.pdf"
+          en_asset_name="hands-on-modern-rl-open-textbook-en-v${version}.pdf"
           echo "tag=${tag}" >> "$GITHUB_OUTPUT"
           echo "version=${version}" >> "$GITHUB_OUTPUT"
           echo "asset_name=${asset_name}" >> "$GITHUB_OUTPUT"
+          echo "en_asset_name=${en_asset_name}" >> "$GITHUB_OUTPUT"
           echo "pdf_path=docs/.vitepress/dist/${asset_name}" >> "$GITHUB_OUTPUT"
+          echo "en_pdf_path=docs/.vitepress/dist/${en_asset_name}" >> "$GITHUB_OUTPUT"
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -63,7 +66,7 @@ jobs:
         id: setup-chrome
         uses: browser-actions/setup-chrome@v1
 
-      - name: Build LaTeX book PDF
+      - name: Build Chinese LaTeX book PDF
         run: node scripts/build-latex-book.mjs --limit 0
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
@@ -74,30 +77,55 @@ jobs:
           PDF_OPTIMIZE_PROFILE: default
           PUPPETEER_EXECUTABLE_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
 
-      - name: Verify PDF asset
+      - name: Build English LaTeX book PDF
+        run: node scripts/build-latex-book.mjs --limit 0
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PDF_VERSION: ${{ steps.release.outputs.version }}
+          PDF_LOCALE: en
+          PDF_BOOK_LIMIT: 0
+          LATEX_BOOK_FILE_NAME: ${{ steps.release.outputs.en_asset_name }}
+          PDF_OPTIMIZE: 1
+          PDF_OPTIMIZE_PROFILE: default
+          PDF_AUTHORS: WalkingLabs; Sanbu
+          PUPPETEER_EXECUTABLE_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
+
+      - name: Verify PDF assets
         run: |
           test -s "${PDF_PATH}"
+          test -s "${EN_PDF_PATH}"
+          echo "Chinese PDF:"
           pdfinfo "${PDF_PATH}" | sed -n '1,18p'
+          echo "English PDF:"
+          pdfinfo "${EN_PDF_PATH}" | sed -n '1,18p'
         env:
           PDF_PATH: ${{ steps.release.outputs.pdf_path }}
+          EN_PDF_PATH: ${{ steps.release.outputs.en_pdf_path }}
 
       - name: Write release notes
         env:
           TAG_NAME: ${{ steps.release.outputs.tag }}
           PDF_ASSET_NAME: ${{ steps.release.outputs.asset_name }}
+          EN_PDF_ASSET_NAME: ${{ steps.release.outputs.en_asset_name }}
         run: |
           pdf_url="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG_NAME}/${PDF_ASSET_NAME}"
+          en_pdf_url="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG_NAME}/${EN_PDF_ASSET_NAME}"
           cat > release-notes.md <<EOF
           # Hands-On Modern RL Open Textbook ${TAG_NAME}
 
-          这是《Hands-On Modern RL：现代强化学习实战》的开放教材 PDF 版本发布页。
+          这是《Hands-On Modern RL：现代强化学习实战》的开放教材版本发布页。本版开始同时提供中文 PDF 与英文 PDF。
 
           ## 下载
 
-          - [下载 PDF 电子书](${pdf_url})
+          - [下载中文 PDF 电子书](${pdf_url})
+          - [Download English PDF textbook](${en_pdf_url})
 
           ## 本版内容
 
+          - 新增完整英文版 PDF：基于 \`docs/en\` 英文课程内容构建
+          - 英文站点内容补齐：中文页面均有英文对应页，清理占位符和半截翻译
+          - 英文图片资源不复制，统一引用中文侧已有图片资产
+          - 对齐中英文标题编号，修复旧章节号残留
           - LaTeX 书籍版排版，不是网页打印导出
           - README logo 书籍封面、本书简介与版本说明
           - 可点击目录、PDF bookmarks/outlines、章节开篇页
@@ -110,7 +138,7 @@ jobs:
 
           ## Assets 说明
 
-          GitHub 会自动在 Assets 中显示 Source code (zip) 和 Source code (tar.gz)，那两个是源码包。请下载 ${PDF_ASSET_NAME}，它才是本书 PDF。
+          GitHub 会自动在 Assets 中显示 Source code (zip) 和 Source code (tar.gz)，那两个是源码包。请下载 ${PDF_ASSET_NAME} 或 ${EN_PDF_ASSET_NAME}，它们才是本书 PDF。前者为中文版本，后者为英文版本。
 
           **Full Changelog**: https://github.com/${GITHUB_REPOSITORY}/commits/${TAG_NAME}
           EOF
@@ -121,7 +149,9 @@ jobs:
           tag_name: ${{ steps.release.outputs.tag }}
           name: Hands-On Modern RL Open Textbook ${{ steps.release.outputs.tag }}
           body_path: release-notes.md
-          files: ${{ steps.release.outputs.pdf_path }}
+          files: |
+            ${{ steps.release.outputs.pdf_path }}
+            ${{ steps.release.outputs.en_pdf_path }}
           fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ github.token }}
