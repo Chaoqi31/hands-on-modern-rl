@@ -12,13 +12,13 @@ Chapter 3 introduced the [policy objective](../chapter03_mdp/policy-objective) $
 
 $$J(\theta) = \mathbb{E}_{\pi_\theta} \left[ \sum_{t=0}^{\infty} \gamma^t r_t \right]$$
 
-| Symbol                    | Role              | Meaning                                                             |
-| ------------------------- | ----------------- | ------------------------------------------------------------------- |
-| $\theta$                  | Policy parameters | Neural network weights: changing them changes the policy's behavior |
-| $\pi_\theta$              | Policy            | Given a state, outputs a probability distribution over actions      |
+| Symbol                    | Role              | Meaning                                                                                        |
+| ------------------------- | ----------------- | ---------------------------------------------------------------------------------------------- |
+| $\theta$                  | Policy parameters | Neural network weights: changing them changes the policy's behavior                            |
+| $\pi_\theta$              | Policy            | Given a state, outputs a probability distribution over actions                                 |
 | $J(\theta)$               | Objective         | The policy's "report card" — the average score achieved by the policy with parameters $\theta$ |
-| $\mathbb{E}_{\pi_\theta}$ | Expectation       | Run the policy many times and average                               |
-| $\gamma^t r_t$            | Discounted reward | Reward at time $t$; farther-future rewards are worth less           |
+| $\mathbb{E}_{\pi_\theta}$ | Expectation       | Run the policy many times and average                                                          |
+| $\gamma^t r_t$            | Discounted reward | Reward at time $t$; farther-future rewards are worth less                                      |
 
 $J(\theta)$ is our north star. The goal is simple: find parameters $\theta$ that maximize $J(\theta)$.
 
@@ -81,13 +81,13 @@ $$\nabla_\theta J(\theta) = \mathbb{E}_{\pi_\theta} \left[ \sum_t \nabla_\theta 
 
 Let's unpack it term by term:
 
-| Symbol                                      | Role                 | Meaning                                                                             |
-| ------------------------------------------- | -------------------- | ----------------------------------------------------------------------------------- |
-| $\nabla_\theta$                             | Take gradient        | Which direction should we change the parameters?                                    |
-| $\log \pi_\theta(a_t \| s_t)$               | Log probability      | Under state $s_t$, the log-probability of choosing action $a_t$                     |
-| $\nabla_\theta \log \pi_\theta(a_t \| s_t)$ | Gradient of log-prob | How do parameters change the probability of choosing this action?                   |
+| Symbol                                      | Role                 | Meaning                                                                                 |
+| ------------------------------------------- | -------------------- | --------------------------------------------------------------------------------------- |
+| $\nabla_\theta$                             | Take gradient        | Which direction should we change the parameters?                                        |
+| $\log \pi_\theta(a_t \| s_t)$               | Log probability      | Under state $s_t$, the log-probability of choosing action $a_t$                         |
+| $\nabla_\theta \log \pi_\theta(a_t \| s_t)$ | Gradient of log-prob | How do parameters change the probability of choosing this action?                       |
 | $G_t$                                       | Return               | Total reward from time $t$ to the end — "how many points did we get after this action?" |
-| Outer $\mathbb{E}$                          | Expectation          | "Run many episodes and average" — approximated by sampling                          |
+| Outer $\mathbb{E}$                          | Expectation          | "Run many episodes and average" — approximated by sampling                              |
 
 In one sentence: **if an action leads to a good outcome (large $G_t$), increase the probability of taking it again; if it leads to a bad outcome (small $G_t$), decrease that probability.**
 
@@ -139,8 +139,8 @@ The gradient is negative, so the parameter updates as $\theta \leftarrow \theta 
 
 Consider a CartPole-like scenario: 3-step episode, $\gamma=0.9$.
 
-| Step | State | Action | Reward |
-| ---- | ----- | ------ | ------ |
+| Step | State | Action        | Reward    |
+| ---- | ----- | ------------- | --------- |
 | 0    | $s_0$ | $a_0$ = right | $r_0 = 1$ |
 | 1    | $s_1$ | $a_1$ = left  | $r_1 = 2$ |
 | 2    | $s_2$ | $a_2$ = right | $r_2 = 3$ |
@@ -165,11 +165,11 @@ $$
 
 Suppose the log-probability gradient values at each step are:
 
-| Step | $\log \pi_\theta(a_t \| s_t)$ | $\nabla_\theta \log \pi_\theta(a_t \| s_t)$ | $G_t$ |
-| ---- | ---- | ---- | ---- |
-| 0 | $\log \pi_\theta(\text{right}\mid s_0) = -0.4$ | $[0.3, -0.1]$ | $5.23$ |
-| 1 | $\log \pi_\theta(\text{left}\mid s_1) = -0.7$ | $[-0.2, 0.4]$ | $4.7$ |
-| 2 | $\log \pi_\theta(\text{right}\mid s_2) = -0.3$ | $[0.1, 0.2]$ | $3$ |
+| Step | $\log \pi_\theta(a_t \| s_t)$                  | $\nabla_\theta \log \pi_\theta(a_t \| s_t)$ | $G_t$  |
+| ---- | ---------------------------------------------- | ------------------------------------------- | ------ |
+| 0    | $\log \pi_\theta(\text{right}\mid s_0) = -0.4$ | $[0.3, -0.1]$                               | $5.23$ |
+| 1    | $\log \pi_\theta(\text{left}\mid s_1) = -0.7$  | $[-0.2, 0.4]$                               | $4.7$  |
+| 2    | $\log \pi_\theta(\text{right}\mid s_2) = -0.3$ | $[0.1, 0.2]$                                | $3$    |
 
 The gradient contribution from each step:
 
@@ -286,11 +286,11 @@ optimizer.step()
 
 Continuing with the 3-step episode from earlier, $\gamma=0.9$:
 
-| Step | State | Action | Reward | $\log \pi_\theta(a_t \| s_t)$ |
-| ---- | ----- | ------ | ------ | ---- |
-| 0 | $s_0$ | right | $r_0=1$ | $-0.4$ |
-| 1 | $s_1$ | left  | $r_1=2$ | $-0.7$ |
-| 2 | $s_2$ | right | $r_2=3$ | $-0.3$ |
+| Step | State | Action | Reward  | $\log \pi_\theta(a_t \| s_t)$ |
+| ---- | ----- | ------ | ------- | ----------------------------- |
+| 0    | $s_0$ | right  | $r_0=1$ | $-0.4$                        |
+| 1    | $s_1$ | left   | $r_1=2$ | $-0.7$                        |
+| 2    | $s_2$ | right  | $r_2=3$ | $-0.3$                        |
 
 **Step 1: Compute the return $G_t$ at each step.**
 
@@ -316,9 +316,9 @@ Summary:
 
 | Step | $r_t$ | $G_t$ |
 | ---- | ----- | ----- |
-| 0 | 1 | 5.23 |
-| 1 | 2 | 4.7 |
-| 2 | 3 | 3 |
+| 0    | 1     | 5.23  |
+| 1    | 2     | 4.7   |
+| 2    | 3     | 3     |
 
 **Step 2: Compute the gradient estimate.**
 
@@ -376,8 +376,8 @@ This is the core pain point of REINFORCE: **high variance**.
 
 $G_t$ is the cumulative return from time $t$ until the episode ends, which includes all randomness along that future trajectory. For the same action, different sampled trajectories can produce very different $G_t$ values:
 
-| Case      | What actually happened             | $G_t$ |
-| --------- | ---------------------------------- | ----- |
+| Case      | What actually happened                    | $G_t$ |
+| --------- | ----------------------------------------- | ----- |
 | Good luck | Subsequent steps all yielded high rewards | Large |
 | Bad luck  | Subsequent steps all yielded low rewards  | Small |
 
@@ -405,10 +405,10 @@ The gradient signal is zero — the parameters do not change.
 
 Now consider a multi-step example. Same 3-step episode structure, $\gamma=0.9$, where the policy chose the same action "right" at $s_0$:
 
-| Episode | $r_0$ | $r_1$ | $r_2$ | $G_0$ | Gradient signal direction |
-| ------- | ----- | ----- | ----- | ----- | ------------------------ |
-| 1       | 1     | 2     | 3     | $1 + 1.8 + 2.43 = 5.23$ | Strongly positive |
-| 2       | 1     | 0     | 0     | $1 + 0 + 0 = 1$ | Weakly positive |
+| Episode | $r_0$ | $r_1$ | $r_2$ | $G_0$                   | Gradient signal direction |
+| ------- | ----- | ----- | ----- | ----------------------- | ------------------------- |
+| 1       | 1     | 2     | 3     | $1 + 1.8 + 2.43 = 5.23$ | Strongly positive         |
+| 2       | 1     | 0     | 0     | $1 + 0 + 0 = 1$         | Weakly positive           |
 
 Both episodes took the same action "right" at $s_0$, yet $G_0$ differs by more than a factor of 4. Episode 1 would push $\pi(\text{right}|s_0)$ up significantly, while Episode 2 would only push it up weakly. The problem is that $G_0$ does not only reflect whether "choosing right at $s_0$ is good" — it also includes the randomness of $r_1$ and $r_2$. The rewards from the subsequent two steps are not controlled by the current action, yet they are all counted into $G_0$.
 

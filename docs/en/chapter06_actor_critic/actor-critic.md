@@ -26,21 +26,21 @@ $$\nabla_\theta J \approx \nabla_\theta \log \pi_\theta(a_t|s_t) \cdot \delta$$
 
 This substitution is fundamentally transformative:
 
-|          | REINFORCE                       | Actor-Critic                                           |
-| -------- | ------------------------------- | ------------------------------------------------------ |
-| Advantage estimate | $G_t$ (MC, needs full trajectory) | $\delta = r + \gamma V(s') - V(s)$ (TD, update after one step) |
-| Update timing      | after the episode ends           | after every step                        |
-| Variance           | high                             | low                                     |
-| Bias               | unbiased                         | biased (bias introduced by [bootstrapping](../chapter03_mdp/dp-mc-td)) |
-| Cost               | none                             | must train a Critic                    |
+|                    | REINFORCE                         | Actor-Critic                                                           |
+| ------------------ | --------------------------------- | ---------------------------------------------------------------------- |
+| Advantage estimate | $G_t$ (MC, needs full trajectory) | $\delta = r + \gamma V(s') - V(s)$ (TD, update after one step)         |
+| Update timing      | after the episode ends            | after every step                                                       |
+| Variance           | high                              | low                                                                    |
+| Bias               | unbiased                          | biased (bias introduced by [bootstrapping](../chapter03_mdp/dp-mc-td)) |
+| Cost               | none                              | must train a Critic                                                    |
 
 ### Numerical Comparison: Both Updates on the Same Scenario
 
 Consider CartPole. At time step $t$ the agent is in state $s_t$, chooses action "right" ($a_t = \text{right}$), and then interacts for 5 more steps until the episode ends. The trajectory is:
 
-| Time | State     | Action  | Reward $r$ |
-| ---- | --------- | ------- | ---------- |
-| $t$  | $s_t$     | right   | 1.0        |
+| Time  | State     | Action | Reward $r$ |
+| ----- | --------- | ------ | ---------- |
+| $t$   | $s_t$     | right  | 1.0        |
 | $t+1$ | $s_{t+1}$ | right  | 1.0        |
 | $t+2$ | $s_{t+2}$ | left   | 1.0        |
 | $t+3$ | $s_{t+3}$ | right  | 1.0        |
@@ -75,12 +75,12 @@ The problem: on a different trajectory, $G_t$ could be 1.0 (the pole fell after 
 
 > **REINFORCE Formula Symbol Table**
 >
-> | Symbol                                     | Meaning                                                                   |
-> | ------------------------------------------ | ------------------------------------------------------------------------- |
-> | $\nabla_\theta \log \pi_\theta(a_t\|s_t)$  | Log-probability gradient w.r.t. policy parameters $\theta$; indicates which direction to adjust |
-> | $G_t$                                      | Full discounted return from time $t$ to the end of the episode            |
-> | $r_{t+k}$                                  | Immediate reward received at time $t+k$                                   |
-> | $\gamma$                                   | Discount factor, controlling how fast future rewards decay                |
+> | Symbol                                    | Meaning                                                                                         |
+> | ----------------------------------------- | ----------------------------------------------------------------------------------------------- |
+> | $\nabla_\theta \log \pi_\theta(a_t\|s_t)$ | Log-probability gradient w.r.t. policy parameters $\theta$; indicates which direction to adjust |
+> | $G_t$                                     | Full discounted return from time $t$ to the end of the episode                                  |
+> | $r_{t+k}$                                 | Immediate reward received at time $t+k$                                                         |
+> | $\gamma$                                  | Discount factor, controlling how fast future rewards decay                                      |
 
 **Actor-Critic computation.** Actor-Critic does not wait for the episode to end. Suppose the Critic estimates $V(s_t) = 2.0$ and $V(s_{t+1}) = 3.0$ for the current and next states. After one step, the immediate reward $r_{t+1} = 1.0$ is received, and the TD Error can be computed immediately:
 
@@ -103,23 +103,23 @@ Using the same $\log \pi(\text{right}|s_t) \approx -0.5108$, the gradient is of 
 
 > **Actor-Critic Formula Symbol Table**
 >
-> | Symbol                                     | Meaning                                                                   |
-> | ------------------------------------------ | ------------------------------------------------------------------------- |
-> | $\nabla_\theta \log \pi_\theta(a_t\|s_t)$  | Log-probability gradient w.r.t. policy parameters $\theta$               |
-> | $\delta$                                   | TD Error, serving as a one-step estimate of the advantage $A(s,a)$        |
-> | $r_{t+1}$                                  | Immediate reward received in this step                                    |
-> | $\gamma V(s_{t+1})$                        | Discounted value estimate of the next state (the Critic's prediction of the future) |
-> | $V(s_t)$                                   | Critic's value estimate for the current state (used as the baseline)      |
+> | Symbol                                    | Meaning                                                                             |
+> | ----------------------------------------- | ----------------------------------------------------------------------------------- |
+> | $\nabla_\theta \log \pi_\theta(a_t\|s_t)$ | Log-probability gradient w.r.t. policy parameters $\theta$                          |
+> | $\delta$                                  | TD Error, serving as a one-step estimate of the advantage $A(s,a)$                  |
+> | $r_{t+1}$                                 | Immediate reward received in this step                                              |
+> | $\gamma V(s_{t+1})$                       | Discounted value estimate of the next state (the Critic's prediction of the future) |
+> | $V(s_t)$                                  | Critic's value estimate for the current state (used as the baseline)                |
 
 The core differences between the two methods can be summarized in a single comparison table:
 
-| Computation step | REINFORCE                                               | Actor-Critic                                          |
-| ---------------- | ------------------------------------------------------- | ----------------------------------------------------- |
-| Update precondition | episode ends, full trajectory available             | one step taken, $r_{t+1}$ and $s_{t+1}$ obtained     |
-| Advantage estimate | $G_t = 4.9010$ (5-step cumulative return)            | $\delta = 1.97$ (one-step TD Error)                   |
-| Gradient weight   | affected by randomness of the entire trajectory        | affected by randomness of a single step only           |
-| Additional components needed | none                                    | Critic providing $V(s_t)$ and $V(s_{t+1})$            |
-| Per-step computation | small (no network forward pass)                     | larger (Critic requires an extra forward pass)        |
+| Computation step             | REINFORCE                                       | Actor-Critic                                     |
+| ---------------------------- | ----------------------------------------------- | ------------------------------------------------ |
+| Update precondition          | episode ends, full trajectory available         | one step taken, $r_{t+1}$ and $s_{t+1}$ obtained |
+| Advantage estimate           | $G_t = 4.9010$ (5-step cumulative return)       | $\delta = 1.97$ (one-step TD Error)              |
+| Gradient weight              | affected by randomness of the entire trajectory | affected by randomness of a single step only     |
+| Additional components needed | none                                            | Critic providing $V(s_t)$ and $V(s_{t+1})$       |
+| Per-step computation         | small (no network forward pass)                 | larger (Critic requires an extra forward pass)   |
 
 ## Actor-Critic Architecture
 
@@ -153,10 +153,10 @@ Actor-Critic Data Flow
 
 Both networks share the same input (state $s$) but perform different tasks:
 
-| Network   | Role             | Input     | Output                           | Learning objective               |
-| --------- | ---------------- | --------- | -------------------------------- | -------------------------------- |
-| Actor     | select actions   | state $s$ | action probabilities $\pi(a\|s)$ | maximize cumulative reward       |
-| Critic    | evaluate states  | state $s$ | value estimate $V(s)$            | predict future return accurately |
+| Network | Role            | Input     | Output                           | Learning objective               |
+| ------- | --------------- | --------- | -------------------------------- | -------------------------------- |
+| Actor   | select actions  | state $s$ | action probabilities $\pi(a\|s)$ | maximize cumulative reward       |
+| Critic  | evaluate states | state $s$ | value estimate $V(s)$            | predict future return accurately |
 
 If you look carefully at the Critic's update rule, $V(s) \leftarrow V(s) + \alpha \cdot \delta$ -- isn't this exactly [TD learning](../chapter03_mdp/dp-mc-td) from Chapter 3? **The Critic is, in essence, a neural-network implementation of the [value function $V(s)$](../chapter03_mdp/value-bellman) from Chapter 3**, independently learning "how many points each state is worth." The Actor is a neural-network implementation of the [policy $\pi(a|s)$](../chapter03_mdp/policy-objective), adjusting its behavior based on the evaluation provided by the Critic.
 
@@ -166,10 +166,10 @@ Two function approximators work in concert -- the Critic helps the Actor judge "
 
 Let us walk through one complete Actor-Critic update step with a concrete scenario. In CartPole, suppose the state vector at some time step is $s = [0.05,\ 0.2,\ -0.03,\ 0.1]$. The current model parameters are $\theta$. After a forward pass, the Actor and Critic produce:
 
-| Component | Output                                  | Value             |
-| --------- | --------------------------------------- | ----------------- |
-| Actor     | action probabilities $\pi(a\|s)$        | $[0.7,\ 0.3]$    |
-| Critic    | state value $V(s)$                      | $1.5$             |
+| Component | Output                           | Value         |
+| --------- | -------------------------------- | ------------- |
+| Actor     | action probabilities $\pi(a\|s)$ | $[0.7,\ 0.3]$ |
+| Critic    | state value $V(s)$               | $1.5$         |
 
 Here $\pi(\text{left}|s) = 0.7$ and $\pi(\text{right}|s) = 0.3$.
 
@@ -223,12 +223,12 @@ Note that $\delta$ is marked as `.detach()` -- it participates in the Actor Loss
 
 > **Actor Loss Formula Symbol Table**
 >
-> | Symbol                           | Meaning                                                                   |
-> | -------------------------------- | ------------------------------------------------------------------------- |
-> | $L_{\text{actor}}$               | Actor's loss function; taking its gradient is equivalent to the policy gradient |
-> | $\log \pi(a\|s)$                 | Log-probability of the chosen action; a differentiable function of $\theta$ |
-> | $\delta$                         | TD Error, serving as the advantage estimate; **does not participate in gradient computation for the Actor** |
-> | negative sign                    | Converts gradient ascent into gradient descent: minimizing $-\log\pi \cdot \delta$ is equivalent to maximizing $\log\pi \cdot \delta$ |
+> | Symbol             | Meaning                                                                                                                               |
+> | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+> | $L_{\text{actor}}$ | Actor's loss function; taking its gradient is equivalent to the policy gradient                                                       |
+> | $\log \pi(a\|s)$   | Log-probability of the chosen action; a differentiable function of $\theta$                                                           |
+> | $\delta$           | TD Error, serving as the advantage estimate; **does not participate in gradient computation for the Actor**                           |
+> | negative sign      | Converts gradient ascent into gradient descent: minimizing $-\log\pi \cdot \delta$ is equivalent to maximizing $\log\pi \cdot \delta$ |
 
 **Step 6: Compute the Critic Loss.**
 
@@ -244,11 +244,11 @@ This is the mean-squared-error form -- it drives $V(s)$ toward the TD target $r 
 
 > **Critic Loss Formula Symbol Table**
 >
-> | Symbol                           | Meaning                                                                   |
-> | -------------------------------- | ------------------------------------------------------------------------- |
-> | $L_{\text{critic}}$              | Critic's loss function, driving $V(s)$ toward the TD target              |
-> | $\delta = r + \gamma V(s') - V(s)$ | TD Error, where $V(s)$ participates in the Critic's gradient computation |
-> | $\delta^2$                       | Squaring ensures that both positive and negative errors produce positive loss, with larger errors penalized more heavily |
+> | Symbol                             | Meaning                                                                                                                  |
+> | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+> | $L_{\text{critic}}$                | Critic's loss function, driving $V(s)$ toward the TD target                                                              |
+> | $\delta = r + \gamma V(s') - V(s)$ | TD Error, where $V(s)$ participates in the Critic's gradient computation                                                 |
+> | $\delta^2$                         | Squaring ensures that both positive and negative errors produce positive loss, with larger errors penalized more heavily |
 
 **Step 7: Total Loss and Backpropagation.**
 
@@ -267,14 +267,14 @@ During backpropagation, gradients flow along two paths:
 
 The complete computation chain for one update step:
 
-| Step       | Input                                    | Computation                              | Output                       |
-| ---------- | ---------------------------------------- | ---------------------------------------- | ---------------------------- |
-| Forward    | $s$                                      | $\text{Actor}(s),\ \text{Critic}(s)$    | $\pi=[0.7,0.3],\ V(s)=1.5$  |
-| Sample     | $\pi$                                    | $\text{Categorical}(\pi).\text{sample}()$ | $a=\text{right}$          |
-| Env        | $s,\ a$                                  | $\text{env.step}(a)$                     | $r=1.0,\ s'$                |
-| Evaluate   | $s'$                                     | $\text{Critic}(s')$                      | $V(s')=2.0$                 |
-| TD         | $r,\ V(s'),\ V(s)$                       | $r+\gamma V(s')-V(s)$                    | $\delta=1.48$               |
-| Loss       | $\log\pi,\ \delta$                       | $-\log\pi\cdot\delta + \delta^2$         | $L=3.9723$                  |
+| Step     | Input              | Computation                               | Output                     |
+| -------- | ------------------ | ----------------------------------------- | -------------------------- |
+| Forward  | $s$                | $\text{Actor}(s),\ \text{Critic}(s)$      | $\pi=[0.7,0.3],\ V(s)=1.5$ |
+| Sample   | $\pi$              | $\text{Categorical}(\pi).\text{sample}()$ | $a=\text{right}$           |
+| Env      | $s,\ a$            | $\text{env.step}(a)$                      | $r=1.0,\ s'$               |
+| Evaluate | $s'$               | $\text{Critic}(s')$                       | $V(s')=2.0$                |
+| TD       | $r,\ V(s'),\ V(s)$ | $r+\gamma V(s')-V(s)$                     | $\delta=1.48$              |
+| Loss     | $\log\pi,\ \delta$ | $-\log\pi\cdot\delta + \delta^2$          | $L=3.9723$                 |
 
 ### Implementing Actor-Critic in PyTorch
 
@@ -467,18 +467,18 @@ loss = actor_loss + critic_loss  # = tensor(4.7994)
 
 Summary of key values across the entire computation chain:
 
-| Variable         | Value    | Meaning                                               |
-| ---------------- | -------- | ----------------------------------------------------- |
-| `probs`          | [0.6, 0.4] | Actor's probability distribution over two actions  |
-| `value`          | 1.2      | Critic's estimate of the current state                |
-| `log_prob`       | -0.9163  | Log-probability of the chosen action (right)          |
-| `reward`         | 1.0      | Immediate reward returned by the environment          |
-| `next_value`     | 2.0      | Critic's estimate of the next state                   |
-| `td_target`      | 2.98     | $r + \gamma V(s')$                                    |
-| `td_error`       | 1.78     | $\delta = \text{td\_target} - V(s)$                  |
-| `actor_loss`     | 1.6310   | $-\log\pi \cdot \delta$ (after .detach)               |
-| `critic_loss`    | 3.1684   | $\delta^2$                                            |
-| `loss`           | 4.7994   | $L_{\text{actor}} + L_{\text{critic}}$               |
+| Variable      | Value      | Meaning                                           |
+| ------------- | ---------- | ------------------------------------------------- |
+| `probs`       | [0.6, 0.4] | Actor's probability distribution over two actions |
+| `value`       | 1.2        | Critic's estimate of the current state            |
+| `log_prob`    | -0.9163    | Log-probability of the chosen action (right)      |
+| `reward`      | 1.0        | Immediate reward returned by the environment      |
+| `next_value`  | 2.0        | Critic's estimate of the next state               |
+| `td_target`   | 2.98       | $r + \gamma V(s')$                                |
+| `td_error`    | 1.78       | $\delta = \text{td\_target} - V(s)$               |
+| `actor_loss`  | 1.6310     | $-\log\pi \cdot \delta$ (after .detach)           |
+| `critic_loss` | 3.1684     | $\delta^2$                                        |
+| `loss`        | 4.7994     | $L_{\text{actor}} + L_{\text{critic}}$            |
 
 ### Actor-Critic Training Curve on CartPole
 
@@ -507,12 +507,12 @@ On CartPole, Actor-Critic typically stabilizes at 500 points (the maximum) withi
 
 Actor-Critic is not the destination; it is a skeleton. In later chapters you will encounter various extensions:
 
-| Chapter                                                              | Variant                          | Key improvement                                          |
-| -------------------------------------------------------------------- | -------------------------------- | -------------------------------------------------------- |
-| [Chapter 7 PPO](../chapter07_ppo/intro)                              | PPO-Clip                         | Limit the size of policy updates to avoid "taking steps that are too big" |
+| Chapter                                                              | Variant                          | Key improvement                                                                                  |
+| -------------------------------------------------------------------- | -------------------------------- | ------------------------------------------------------------------------------------------------ |
+| [Chapter 7 PPO](../chapter07_ppo/intro)                              | PPO-Clip                         | Limit the size of policy updates to avoid "taking steps that are too big"                        |
 | [Chapter 7 GAE](../chapter07_ppo/gae-reward-model)                   | Generalized Advantage Estimation | Exponentially weighted sum of multi-step TD errors; precisely control the bias-variance tradeoff |
-| [Chapter 9 DPO](../chapter09_alignment/intro)                        | Implicit Actor-Critic            | Replace the Critic with preference data; remove the on-policy constraint |
-| [Chapter 9 GRPO](../chapter09_grpo_rlvr/grpo-practice-and-mechanism) | Remove the Critic                | Replace $V(s)$ with an in-group mean; save one network   |
+| [Chapter 9 DPO](../chapter09_alignment/intro)                        | Implicit Actor-Critic            | Replace the Critic with preference data; remove the on-policy constraint                         |
+| [Chapter 9 GRPO](../chapter09_grpo_rlvr/grpo-practice-and-mechanism) | Remove the Critic                | Replace $V(s)$ with an in-group mean; save one network                                           |
 
 All variants share the same skeleton: one network responsible for choosing, plus one signal responsible for evaluating. What changes is only "where the evaluation signal comes from" and "how the selection network is updated."
 

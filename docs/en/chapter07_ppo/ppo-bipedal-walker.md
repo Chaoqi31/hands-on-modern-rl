@@ -226,8 +226,8 @@ At 2M steps, the policy has formed a stable and efficient gait. Joint coordinati
 
 Evaluation summary across the three stages (20-episode mean):
 
-| Training Steps | Mean Reward | Std. Dev. | Behavior                                             |
-| -------------- | ----------- | --------- | ---------------------------------------------------- |
+| Training Steps | Mean Reward | Std. Dev. | Behavior                                                 |
+| -------------- | ----------- | --------- | -------------------------------------------------------- |
 | 100k           | -34.1       | 3.3       | Can stand but cannot walk; every episode runs 1600 steps |
 | 500k           | -65.2       | 73.1      | Transition: ~15% of episodes walk, the rest still fall   |
 | 2M             | 282.5       | 59.7      | Stable, efficient walking; most episodes score 290+      |

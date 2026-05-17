@@ -18,10 +18,10 @@ The DQN from Chapter 4 follows a clear recipe: approximate $Q(s,a)$ with a neura
 
 Consider a concrete moment in CartPole. Suppose the current state is $s = [0.05,\; 0.1,\; -0.02,\; 0.3]$ (position, velocity, pole angle, angular velocity). The DQN network performs one forward pass on this state and outputs two $Q$ values:
 
-| Action      | $Q(s,a)$ |
-| ----------- | -------- |
-| Push left   | $0.8$    |
-| Push right  | $1.2$    |
+| Action     | $Q(s,a)$ |
+| ---------- | -------- |
+| Push left  | $0.8$    |
+| Push right | $1.2$    |
 
 $\arg\max$ simply compares them and returns the action with the highest value:
 
@@ -31,13 +31,13 @@ $$
 
 The key prerequisite is that the set of actions is finite and small, so we can compute a $Q$ value for each one and compare them all. CartPole has only 2 actions, so we compare 2 numbers; LunarLander has 4 actions, so we compare 4 numbers. Scale up to 10, 100, or even 1000 actions, and $\arg\max$ still works -- it just requires computing a few more $Q$ values and doing more comparisons, but the cost grows linearly with no fundamental difficulty.
 
-| Number of actions | $Q$ values to compute | $\arg\max$ comparisons | Feasibility |
-| ----------------- | --------------------- | ---------------------- | ----------- |
-| 2                 | 2                     | 1                      | Easy        |
-| 4                 | 4                     | 3                      | Easy        |
-| 1000              | 1000                  | 999                    | Feasible    |
+| Number of actions | $Q$ values to compute | $\arg\max$ comparisons | Feasibility       |
+| ----------------- | --------------------- | ---------------------- | ----------------- |
+| 2                 | 2                     | 1                      | Easy              |
+| 4                 | 4                     | 3                      | Easy              |
+| 1000              | 1000                  | 999                    | Feasible          |
 | $10^6$            | $10^6$                | $10^6 - 1$             | Feasible but slow |
-| $\infty$          | $\infty$              | $\infty$               | Impossible  |
+| $\infty$          | $\infty$              | $\infty$               | Impossible        |
 
 The last row is where the problem lies. When the action space is continuous, there are infinitely many actions. It is impossible to compute a $Q$ value for each one, let alone find the maximum among infinitely many values.
 
@@ -63,10 +63,10 @@ $$
 
 11.6 days just to choose one action. By contrast, a policy network needs only one forward pass -- feed the state into the network and directly output the action vector, taking roughly $1\text{ms}$:
 
-| Method                | Computation per action selection                     | Time                  |
-| --------------------- | ---------------------------------------------------- | --------------------- |
-| DQN + discretization  | $10^{12}$ forward passes                             | $\approx 11.6$ days   |
-| Policy network        | 1 forward pass, directly outputs $\mu = f_\theta(s)$ | $\approx 1\text{ms}$  |
+| Method               | Computation per action selection                     | Time                 |
+| -------------------- | ---------------------------------------------------- | -------------------- |
+| DQN + discretization | $10^{12}$ forward passes                             | $\approx 11.6$ days  |
+| Policy network       | 1 forward pass, directly outputs $\mu = f_\theta(s)$ | $\approx 1\text{ms}$ |
 
 And this is only 6 joints with each joint discretized to 100 values. With more joints or finer precision requirements, the number of discretized actions grows exponentially. This is the **curse of dimensionality**: each additional joint multiplies the total number of actions by a constant factor.
 
@@ -77,12 +77,12 @@ Text generation in large language models faces a related issue. At each step, th
 Suppose the model is generating the next token and has output the following probabilities:
 
 | token | $P(\text{token} \mid \text{context})$ |
-| ----- | -------------------------------------- |
-| "is"  | $0.40$                                 |
-| "are" | $0.25$                                 |
-| "was" | $0.15$                                 |
-| "be"  | $0.10$                                 |
-| ...   | ...                                    |
+| ----- | ------------------------------------- |
+| "is"  | $0.40$                                |
+| "are" | $0.25$                                |
+| "was" | $0.15$                                |
+| "be"  | $0.10$                                |
+| ...   | ...                                   |
 
 $\arg\max$ (greedy decoding) always selects the highest-probability "is". If the probability distributions at several subsequent positions are similar, greedy decoding will repeatedly output the same token. Sampling from the distribution, on the other hand, gives a 25% chance of selecting "are", a 15% chance of selecting "was" -- this randomness is precisely what fluent text generation requires. A policy network naturally outputs a probability distribution $\pi_\theta(a|s)$, and sampling is the generation process itself.
 
@@ -102,12 +102,12 @@ $$
 \pi_\theta(\text{left} \mid s) = 0.3, \quad \pi_\theta(\text{right} \mid s) = 0.7.
 $$
 
-| Symbol                          | Meaning                                                   |
-| ------------------------------- | --------------------------------------------------------- |
-| $\pi_\theta$                    | Policy network parameterized by $\theta$                  |
-| $\pi_\theta(a \mid s)$          | Probability of selecting action $a$ in state $s$          |
-| $s = [0.05, 0.1, -0.02, 0.3]$  | Current state (position, velocity, pole angle, angular velocity) |
-| $[0.3, 0.7]$                    | Action probability vector output by the network           |
+| Symbol                        | Meaning                                                          |
+| ----------------------------- | ---------------------------------------------------------------- |
+| $\pi_\theta$                  | Policy network parameterized by $\theta$                         |
+| $\pi_\theta(a \mid s)$        | Probability of selecting action $a$ in state $s$                 |
+| $s = [0.05, 0.1, -0.02, 0.3]$ | Current state (position, velocity, pole angle, angular velocity) |
+| $[0.3, 0.7]$                  | Action probability vector output by the network                  |
 
 Action selection is done by **sampling**, not comparison. From the distribution $[0.3, 0.7]$, draw a sample: generate a uniform random number $u \in [0,1)$; if $u < 0.3$, push left; otherwise, push right. For example, with $u = 0.65$, since $0.65 > 0.3$, the action is "push right."
 
@@ -133,16 +133,16 @@ For continuous action spaces, the policy network switches to outputting the para
 
 ## Differences Between the Two Routes
 
-|                  | Value-Based (DQN)                               | Policy-Based (Policy Gradient)                |
-| ---------------- | ------------------------------------------------ | --------------------------------------------- |
-| What it learns   | $Q(s,a)$: how much each action is worth          | $\pi_\theta(a\|s)$: what probability to assign each action |
-| Action selection | $\arg\max_a Q(s,a)$ (pick the highest score)    | Sample from $\pi_\theta(\cdot\|s)$            |
-| Policy form      | Deterministic (always pick the highest score)    | Stochastic (outputs a probability distribution) |
-| Action space     | Discrete only                                    | Discrete + continuous                         |
-| Exploration      | External ($\varepsilon$-greedy)                  | Built-in (probability distribution naturally includes exploration) |
-| Data reuse       | Off-policy (replay buffer can reuse old data)    | On-policy (must use fresh data from the current policy) |
-| Variance         | Low (TD targets are relatively stable)           | High (Monte Carlo returns fluctuate widely)   |
-| Representative algorithm | DQN (Chapter 4)                        | REINFORCE (this chapter) $\to$ PPO (Chapter 7) |
+|                          | Value-Based (DQN)                             | Policy-Based (Policy Gradient)                                     |
+| ------------------------ | --------------------------------------------- | ------------------------------------------------------------------ |
+| What it learns           | $Q(s,a)$: how much each action is worth       | $\pi_\theta(a\|s)$: what probability to assign each action         |
+| Action selection         | $\arg\max_a Q(s,a)$ (pick the highest score)  | Sample from $\pi_\theta(\cdot\|s)$                                 |
+| Policy form              | Deterministic (always pick the highest score) | Stochastic (outputs a probability distribution)                    |
+| Action space             | Discrete only                                 | Discrete + continuous                                              |
+| Exploration              | External ($\varepsilon$-greedy)               | Built-in (probability distribution naturally includes exploration) |
+| Data reuse               | Off-policy (replay buffer can reuse old data) | On-policy (must use fresh data from the current policy)            |
+| Variance                 | Low (TD targets are relatively stable)        | High (Monte Carlo returns fluctuate widely)                        |
+| Representative algorithm | DQN (Chapter 4)                               | REINFORCE (this chapter) $\to$ PPO (Chapter 7)                     |
 
 Key differences explained row by row.
 
@@ -160,11 +160,11 @@ Walk through both routes on a concrete scenario. Setup: 3 states $\{s_1, s_2, s_
 
 Suppose after training, DQN has learned the following $Q$ table:
 
-| State    | $Q(s, a_1)$ | $Q(s, a_2)$ |
-| -------- | ----------- | ----------- |
-| $s_1$    | $1.5$       | $2.3$       |
-| $s_2$    | $0.8$       | $-0.4$      |
-| $s_3$    | $3.1$       | $2.9$       |
+| State | $Q(s, a_1)$ | $Q(s, a_2)$ |
+| ----- | ----------- | ----------- |
+| $s_1$ | $1.5$       | $2.3$       |
+| $s_2$ | $0.8$       | $-0.4$      |
+| $s_3$ | $3.1$       | $2.9$       |
 
 Apply $\arg\max$ at each state:
 
@@ -182,11 +182,11 @@ $$
 
 The result is a deterministic policy table: every state always selects the same action. If exploration is needed, $\varepsilon$-greedy must be added on top. For example, with $\varepsilon = 0.1$, there is a 10% probability of choosing randomly:
 
-| State  | Probability of $a_1$                   | Probability of $a_2$                   |
-| ------ | --------------------------------------- | --------------------------------------- |
-| $s_1$  | $0.1 \times 0.5 = 0.05$                | $0.9 + 0.1 \times 0.5 = 0.95$          |
-| $s_2$  | $0.9 + 0.1 \times 0.5 = 0.95$          | $0.1 \times 0.5 = 0.05$                |
-| $s_3$  | $0.9 + 0.1 \times 0.5 = 0.95$          | $0.1 \times 0.5 = 0.05$                |
+| State | Probability of $a_1$          | Probability of $a_2$          |
+| ----- | ----------------------------- | ----------------------------- |
+| $s_1$ | $0.1 \times 0.5 = 0.05$       | $0.9 + 0.1 \times 0.5 = 0.95$ |
+| $s_2$ | $0.9 + 0.1 \times 0.5 = 0.95$ | $0.1 \times 0.5 = 0.05$       |
+| $s_3$ | $0.9 + 0.1 \times 0.5 = 0.95$ | $0.1 \times 0.5 = 0.05$       |
 
 $\varepsilon$-greedy exploration is uniform: the 10% random exploration is split equally between $a_1$ and $a_2$. Even though $Q(s_3, a_2) = 2.9$ is very close to $Q(s_3, a_1) = 3.1$ (the two actions are nearly equally good), the exploration probability allocation is identical to $s_1$ where the gap is large.
 
@@ -194,22 +194,22 @@ $\varepsilon$-greedy exploration is uniform: the 10% random exploration is split
 
 Suppose the policy network has learned the following probability distributions:
 
-| State  | $\pi(a_1 \mid s)$ | $\pi(a_2 \mid s)$ |
-| ------ | ------------------ | ------------------ |
-| $s_1$  | $0.2$              | $0.8$              |
-| $s_2$  | $0.9$              | $0.1$              |
-| $s_3$  | $0.55$             | $0.45$             |
+| State | $\pi(a_1 \mid s)$ | $\pi(a_2 \mid s)$ |
+| ----- | ----------------- | ----------------- |
+| $s_1$ | $0.2$             | $0.8$             |
+| $s_2$ | $0.9$             | $0.1$             |
+| $s_3$ | $0.55$            | $0.45$            |
 
 At $s_3$, the policy network considers the two actions nearly equally good ($0.55$ vs $0.45$), so the exploration ratio is naturally high; at $s_1$ and $s_2$, one action clearly dominates, so exploration is naturally low. No manual $\varepsilon$ tuning is needed -- the probability distribution itself encodes "how much to explore."
 
 Placing the key numbers from both routes side by side:
 
-| Dimension              | DQN at $s_3$                                          | Policy gradient at $s_3$                               |
-| ---------------------- | ------------------------------------------------------ | ------------------------------------------------------- |
-| Network output         | $Q(s_3, a_1) = 3.1$, $Q(s_3, a_2) = 2.9$              | $\pi(a_1 \mid s_3) = 0.55$, $\pi(a_2 \mid s_3) = 0.45$ |
-| Action selection       | $\arg\max\{3.1, 2.9\} = a_1$                          | Sampling: 55% chance $a_1$, 45% chance $a_2$           |
-| Exploration            | External $\varepsilon$-greedy (uniform random)         | Built-in (adaptive probability distribution)            |
-| Continuous action space | Not applicable (requires discretized $Q$-value grid)  | Applicable (directly outputs Gaussian parameters)       |
+| Dimension               | DQN at $s_3$                                         | Policy gradient at $s_3$                               |
+| ----------------------- | ---------------------------------------------------- | ------------------------------------------------------ |
+| Network output          | $Q(s_3, a_1) = 3.1$, $Q(s_3, a_2) = 2.9$             | $\pi(a_1 \mid s_3) = 0.55$, $\pi(a_2 \mid s_3) = 0.45$ |
+| Action selection        | $\arg\max\{3.1, 2.9\} = a_1$                         | Sampling: 55% chance $a_1$, 45% chance $a_2$           |
+| Exploration             | External $\varepsilon$-greedy (uniform random)       | Built-in (adaptive probability distribution)           |
+| Continuous action space | Not applicable (requires discretized $Q$-value grid) | Applicable (directly outputs Gaussian parameters)      |
 
 The core difference is in the last row: DQN's $\arg\max$ confines the action space to a finite discrete set; policy gradients skip the step of "scoring every action" and directly output a probability distribution over "how to choose actions," removing the barrier of continuous action spaces entirely.
 

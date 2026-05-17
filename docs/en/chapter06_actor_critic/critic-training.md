@@ -33,16 +33,16 @@ $$V_\phi(s) \leftarrow \sum_a \pi(a|s) \left[ R(s,a) + \gamma \sum_{s'} P(s'|s,a
 
 Each symbol in this equation:
 
-| Symbol                    | Meaning                                                        |
-| ------------------------- | -------------------------------------------------------------- |
-| $V_\phi(s)$               | Critic's current value estimate for state $s$, with parameters $\phi$ |
-| $a$                       | An action available at state $s$ (e.g., left, right)          |
-| $\pi(a \mid s)$           | Probability that the current policy selects action $a$ at state $s$ |
-| $R(s,a)$                  | Immediate reward received after taking action $a$ in state $s$ |
-| $s'$                      | A possible next state after taking action $a$                 |
-| $P(s' \mid s,a)$          | Probability of transitioning to $s'$ from state $s$ and action $a$ |
-| $V_\phi(s')$              | Critic's current value estimate for next state $s'$           |
-| $\gamma$                  | Discount factor                                                |
+| Symbol           | Meaning                                                               |
+| ---------------- | --------------------------------------------------------------------- |
+| $V_\phi(s)$      | Critic's current value estimate for state $s$, with parameters $\phi$ |
+| $a$              | An action available at state $s$ (e.g., left, right)                  |
+| $\pi(a \mid s)$  | Probability that the current policy selects action $a$ at state $s$   |
+| $R(s,a)$         | Immediate reward received after taking action $a$ in state $s$        |
+| $s'$             | A possible next state after taking action $a$                         |
+| $P(s' \mid s,a)$ | Probability of transitioning to $s'$ from state $s$ and action $a$    |
+| $V_\phi(s')$     | Critic's current value estimate for next state $s'$                   |
+| $\gamma$         | Discount factor                                                       |
 
 Expanding for state $S$ in the corridor. The outer sum weights over actions according to the policy; the inner sum weights over next states according to the transition probabilities. Since transitions are deterministic (moving right always goes right; moving left either hits the wall or goes back), the inner $\sum_{s'}$ has probability 1 only for the actual destination:
 
@@ -118,13 +118,13 @@ $$
 
 Summary of each round:
 
-| Round | $V(S)$ | $V(M)$ | $V(G)$ |
-| ----- | ------ | ------ | ------ |
-| 0     | 0      | 0      | 0      |
-| 1     | -1.2   | -1.2   | 0      |
-| 2     | -2.4   | -1.44  | 0      |
-| 3     | -2.832 | -1.68  | 0      |
-| converged | -3.375 | -1.875 | 0  |
+| Round     | $V(S)$ | $V(M)$ | $V(G)$ |
+| --------- | ------ | ------ | ------ |
+| 0         | 0      | 0      | 0      |
+| 1         | -1.2   | -1.2   | 0      |
+| 2         | -2.4   | -1.44  | 0      |
+| 3         | -2.832 | -1.68  | 0      |
+| converged | -3.375 | -1.875 | 0      |
 
 In each round, the values for $S$ and $M$ encode the "average consequence of acting under the current policy" -- moving right is generally better, but the policy occasionally moves left, and the costs of detours and wall bumps must also enter the value table.
 
@@ -140,11 +140,11 @@ $$L_{\text{Critic}} = \left( G_t - V_\phi(s) \right)^2 \tag{6.3}$$
 
 Each symbol in this equation:
 
-| Symbol                | Meaning                                                        |
-| --------------------- | -------------------------------------------------------------- |
-| $L_{\text{Critic}}$   | Critic loss, measuring the prediction error                   |
-| $G_t$                 | Actual discounted return from time step $t$ to the end of the episode (the MC target) |
-| $V_\phi(s)$           | Critic's current value prediction for state $s$               |
+| Symbol              | Meaning                                                                               |
+| ------------------- | ------------------------------------------------------------------------------------- |
+| $L_{\text{Critic}}$ | Critic loss, measuring the prediction error                                           |
+| $G_t$               | Actual discounted return from time step $t$ to the end of the episode (the MC target) |
+| $V_\phi(s)$         | Critic's current value prediction for state $s$                                       |
 
 $G_t - V_\phi(s)$ is the Critic's prediction error -- the episode actually returned $G_t$, but the Critic previously predicted $V_\phi(s)$. The loss is the square of this error.
 
@@ -158,13 +158,13 @@ $$
 
 With $\gamma=1$, we compute $G_t$ by summing the rewards from each visit position to the end:
 
-| Visit | State | Remaining rewards     | $G_t$ computation                                                              | MC target $G_t$ |
-| ----- | ----- | --------------------- | ------------------------------------------------------------------------------ | --------------- |
-| 1     | $S$   | $-2,-1,-2,-1,-1$      | $-2 + (-1) + (-2) + (-1) + (-1)$                                              | $-7$            |
-| 2     | $S$   | $-1,-2,-1,-1$         | $-1 + (-2) + (-1) + (-1)$                                                      | $-5$            |
-| 3     | $M$   | $-2,-1,-1$            | $-2 + (-1) + (-1)$                                                             | $-4$            |
-| 4     | $S$   | $-1,-1$               | $-1 + (-1)$                                                                    | $-2$            |
-| 5     | $M$   | $-1$                  | $-1$                                                                           | $-1$            |
+| Visit | State | Remaining rewards | $G_t$ computation                | MC target $G_t$ |
+| ----- | ----- | ----------------- | -------------------------------- | --------------- |
+| 1     | $S$   | $-2,-1,-2,-1,-1$  | $-2 + (-1) + (-2) + (-1) + (-1)$ | $-7$            |
+| 2     | $S$   | $-1,-2,-1,-1$     | $-1 + (-2) + (-1) + (-1)$        | $-5$            |
+| 3     | $M$   | $-2,-1,-1$        | $-2 + (-1) + (-1)$               | $-4$            |
+| 4     | $S$   | $-1,-1$           | $-1 + (-1)$                      | $-2$            |
+| 5     | $M$   | $-1$              | $-1$                             | $-1$            |
 
 ### Loss Computation and Gradient Update
 
@@ -190,11 +190,11 @@ The complete update process across all visits:
 
 | Updated state | MC target $G_t$ | Old value | Update computation                                                     | New value |
 | ------------- | --------------- | --------- | ---------------------------------------------------------------------- | --------- |
-| 1st $S$       | $-7$            | 0         | $0 + 0.5 \times (-7 - 0) = -3.5$                                      | $-3.5$    |
-| 2nd $S$       | $-5$            | $-3.5$    | $-3.5 + 0.5 \times [-5 - (-3.5)] = -3.5 + 0.5 \times (-1.5) = -4.25$ | $-4.25$   |
-| 1st $M$       | $-4$            | 0         | $0 + 0.5 \times (-4 - 0) = -2$                                        | $-2$      |
-| 3rd $S$       | $-2$            | $-4.25$   | $-4.25 + 0.5 \times [-2 - (-4.25)] = -4.25 + 0.5 \times 2.25 = -3.125$ | $-3.125$ |
-| 2nd $M$       | $-1$            | $-2$      | $-2 + 0.5 \times [-1 - (-2)] = -2 + 0.5 \times 1 = -1.5$             | $-1.5$    |
+| 1st $S$       | $-7$            | 0         | $0 + 0.5 \times (-7 - 0) = -3.5$                                       | $-3.5$    |
+| 2nd $S$       | $-5$            | $-3.5$    | $-3.5 + 0.5 \times [-5 - (-3.5)] = -3.5 + 0.5 \times (-1.5) = -4.25$   | $-4.25$   |
+| 1st $M$       | $-4$            | 0         | $0 + 0.5 \times (-4 - 0) = -2$                                         | $-2$      |
+| 3rd $S$       | $-2$            | $-4.25$   | $-4.25 + 0.5 \times [-2 - (-4.25)] = -4.25 + 0.5 \times 2.25 = -3.125$ | $-3.125$  |
+| 2nd $M$       | $-1$            | $-2$      | $-2 + 0.5 \times [-1 - (-2)] = -2 + 0.5 \times 1 = -1.5$               | $-1.5$    |
 
 MC methods (recall the [MC value update](../chapter03_mdp/dp-mc-td): $V(s) \leftarrow V(s) + \alpha[G_t - V(s)]$) provide an **unbiased estimate** because they use the true return, but they have two limitations:
 
@@ -211,14 +211,14 @@ $$L_{\text{Critic}} = \left( r + \gamma V_\phi(s') - V_\phi(s) \right)^2 = \delt
 
 Each symbol in this equation:
 
-| Symbol                | Meaning                                                        |
-| --------------------- | -------------------------------------------------------------- |
-| $L_{\text{Critic}}$   | Critic loss, measuring the magnitude of the TD Error          |
-| $r$                   | Immediate reward received at the current step                  |
-| $\gamma$              | Discount factor                                                |
-| $V_\phi(s')$          | Critic's current value prediction for next state $s'$         |
-| $V_\phi(s)$           | Critic's current value prediction for current state $s$       |
-| $\delta$              | TD Error, i.e., $r + \gamma V_\phi(s') - V_\phi(s)$          |
+| Symbol              | Meaning                                                 |
+| ------------------- | ------------------------------------------------------- |
+| $L_{\text{Critic}}$ | Critic loss, measuring the magnitude of the TD Error    |
+| $r$                 | Immediate reward received at the current step           |
+| $\gamma$            | Discount factor                                         |
+| $V_\phi(s')$        | Critic's current value prediction for next state $s'$   |
+| $V_\phi(s)$         | Critic's current value prediction for current state $s$ |
+| $\delta$            | TD Error, i.e., $r + \gamma V_\phi(s') - V_\phi(s)$     |
 
 Minimizing $\delta^2$ makes the Critic's predictions progressively more accurate. The meaning of $\delta$: after taking one step, the difference between "the reward actually received plus the next-step prediction" and "the current prediction." $\delta > 0$ means this step was better than expected; $\delta < 0$ means it was worse.
 
@@ -290,13 +290,13 @@ $\delta = 0.5 > 0$ indicates that moving right from $M$ to the terminal was bett
 
 ### Step-by-step Summary
 
-| Step | Transition               | Updated state | Old $V(s)$ | $r$  | $V(s')$ | TD target $r + \gamma V(s')$ | $\delta$ | New $V(s)$ |
-| ---- | ------------------------ | ------------- | ---------- | ---- | ------- | ---------------------------- | -------- | ---------- |
-| 1    | $S \xrightarrow{-2} S$  | $S$           | 0          | $-2$ | 0       | $-2 + 0 = -2$                | $-2$     | $-1$       |
-| 2    | $S \xrightarrow{-1} M$  | $S$           | $-1$       | $-1$ | 0       | $-1 + 0 = -1$                | $0$      | $-1$       |
-| 3    | $M \xrightarrow{-2} S$  | $M$           | 0          | $-2$ | $-1$    | $-2 + (-1) = -3$             | $-3$     | $-1.5$     |
-| 4    | $S \xrightarrow{-1} M$  | $S$           | $-1$       | $-1$ | $-1.5$  | $-1 + (-1.5) = -2.5$         | $-1.5$   | $-1.75$    |
-| 5    | $M \xrightarrow{-1} G$  | $M$           | $-1.5$     | $-1$ | 0       | $-1 + 0 = -1$                | $0.5$    | $-1.25$    |
+| Step | Transition             | Updated state | Old $V(s)$ | $r$  | $V(s')$ | TD target $r + \gamma V(s')$ | $\delta$ | New $V(s)$ |
+| ---- | ---------------------- | ------------- | ---------- | ---- | ------- | ---------------------------- | -------- | ---------- |
+| 1    | $S \xrightarrow{-2} S$ | $S$           | 0          | $-2$ | 0       | $-2 + 0 = -2$                | $-2$     | $-1$       |
+| 2    | $S \xrightarrow{-1} M$ | $S$           | $-1$       | $-1$ | 0       | $-1 + 0 = -1$                | $0$      | $-1$       |
+| 3    | $M \xrightarrow{-2} S$ | $M$           | 0          | $-2$ | $-1$    | $-2 + (-1) = -3$             | $-3$     | $-1.5$     |
+| 4    | $S \xrightarrow{-1} M$ | $S$           | $-1$       | $-1$ | $-1.5$  | $-1 + (-1.5) = -2.5$         | $-1.5$   | $-1.75$    |
+| 5    | $M \xrightarrow{-1} G$ | $M$           | $-1.5$     | $-1$ | 0       | $-1 + 0 = -1$                | $0.5$    | $-1.25$    |
 
 ### TD Loss Computation
 
@@ -324,13 +324,13 @@ The price is introducing **bias**: $V_\phi(s')$ is itself an estimate, not the t
 
 ## Comparing the Three Methods
 
-|                         | **DP**              | **MC** | **TD**             |
-| ----------------------- | ------------------- | ------ | ------------------ |
-| **Used to train Critic?** | Theoretical baseline | Usable | **Practical default** |
-| **Need episode to end?** | No                  | Yes    | No                 |
-| **Unbiased?**           | Yes                 | Yes    | No (biased but lower variance) |
-| **Variance**            | Low                 | High   | Medium             |
-| **Bootstrapping**       | Yes                 | No     | Yes                |
+|                           | **DP**               | **MC** | **TD**                         |
+| ------------------------- | -------------------- | ------ | ------------------------------ |
+| **Used to train Critic?** | Theoretical baseline | Usable | **Practical default**          |
+| **Need episode to end?**  | No                   | Yes    | No                             |
+| **Unbiased?**             | Yes                  | Yes    | No (biased but lower variance) |
+| **Variance**              | Low                  | High   | Medium                         |
+| **Bootstrapping**         | Yes                  | No     | Yes                            |
 
 ### MC vs. TD: A Numerical Comparison
 

@@ -195,57 +195,57 @@ The course is divided into four parts plus appendices. The README keeps only the
 
 ### Preface
 
-| Module | Description |
-| :----- | :---------- |
-| [Course Guide](docs/preface/intro.md) | Course positioning, learning path, and how to use the materials. |
+| Module                                                                           | Description                                                        |
+| :------------------------------------------------------------------------------- | :----------------------------------------------------------------- |
+| [Course Guide](docs/preface/intro.md)                                            | Course positioning, learning path, and how to use the materials.   |
 | [A Brief History of Reinforcement Learning](docs/preface/brief-history/index.md) | From trial-and-error learning to AlphaGo, RLHF, and LLM alignment. |
-| [Environment Setup](docs/preface/env-setup.md) | Installation and dependency setup for the course. |
+| [Environment Setup](docs/preface/env-setup.md)                                   | Installation and dependency setup for the course.                  |
 
 ### Part 1: Foundations by Practice
 
-| Chapter | Main Topic | What It Covers |
-| :------ | :--------- | :------------- |
-| 01 | [CartPole](docs/chapter01_cartpole/intro.md) | States, actions, rewards, policies, values, entropy, and training curves through a first runnable control task. |
-| 02 | [DPO Preference Fine-tuning](docs/chapter02_dpo/intro.md) | Preference data, DPO objectives, reward margins, accuracy, and the first bridge from RL intuition to LLM post-training. |
-| Summary | [Part 1 Summary](docs/summaries/part1-summary.md) | The practical intuition learners should have before entering formal RL theory. |
+| Chapter | Main Topic                                                | What It Covers                                                                                                          |
+| :------ | :-------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------- |
+| 01      | [CartPole](docs/chapter01_cartpole/intro.md)              | States, actions, rewards, policies, values, entropy, and training curves through a first runnable control task.         |
+| 02      | [DPO Preference Fine-tuning](docs/chapter02_dpo/intro.md) | Preference data, DPO objectives, reward margins, accuracy, and the first bridge from RL intuition to LLM post-training. |
+| Summary | [Part 1 Summary](docs/summaries/part1-summary.md)         | The practical intuition learners should have before entering formal RL theory.                                          |
 
 ### Part 2: Core Theory and Methods
 
-| Chapter | Main Topic | What It Covers |
-| :------ | :--------- | :------------- |
-| 03 | [MDPs and Value Functions](docs/chapter03_mdp/intro.md) | Bandits, MDPs, value functions, Bellman equations, TD learning, Q-learning, policy objectives, data sources, and reward design. |
-| 04 | [Deep Q-Networks](docs/chapter04_dqn/intro.md) | From tabular Q-learning to DQN, replay buffers, target networks, CNN encoders, LunarLander, Atari, and visual game projects. |
-| 05 | [Policy Gradient and REINFORCE](docs/chapter05_policy_gradient/intro.md) | Direct policy optimization, sampling-based gradients, baselines, and variance reduction. |
-| 06 | [Actor-Critic](docs/chapter06_actor_critic/intro.md) | Actor-critic architecture, advantage functions, TD-error critic training, and game-playing agents. |
-| 07 | [PPO](docs/chapter07_ppo/intro.md) | PPO experiments, clipped objectives, trust-region intuition, GAE, reward models, long-horizon planning, and BipedalWalker practice. |
-| Summary | [Part 2 Summary](docs/summaries/part2-summary.md) | The algorithmic patterns that repeat across classic and modern RL. |
+| Chapter | Main Topic                                                               | What It Covers                                                                                                                      |
+| :------ | :----------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------- |
+| 03      | [MDPs and Value Functions](docs/chapter03_mdp/intro.md)                  | Bandits, MDPs, value functions, Bellman equations, TD learning, Q-learning, policy objectives, data sources, and reward design.     |
+| 04      | [Deep Q-Networks](docs/chapter04_dqn/intro.md)                           | From tabular Q-learning to DQN, replay buffers, target networks, CNN encoders, LunarLander, Atari, and visual game projects.        |
+| 05      | [Policy Gradient and REINFORCE](docs/chapter05_policy_gradient/intro.md) | Direct policy optimization, sampling-based gradients, baselines, and variance reduction.                                            |
+| 06      | [Actor-Critic](docs/chapter06_actor_critic/intro.md)                     | Actor-critic architecture, advantage functions, TD-error critic training, and game-playing agents.                                  |
+| 07      | [PPO](docs/chapter07_ppo/intro.md)                                       | PPO experiments, clipped objectives, trust-region intuition, GAE, reward models, long-horizon planning, and BipedalWalker practice. |
+| Summary | [Part 2 Summary](docs/summaries/part2-summary.md)                        | The algorithmic patterns that repeat across classic and modern RL.                                                                  |
 
 ### Part 3: LLM-era RL
 
-| Chapter | Main Topic | What It Covers |
-| :------ | :--------- | :------------- |
-| 08 | [The Full RLHF Pipeline](docs/chapter08_rlhf/intro.md) | SFT, reward modeling, PPO-style RLHF, evaluation, scaling, and reward hacking. |
-| 09 | [Post-Training Alignment](docs/chapter09_alignment/intro.md) | DPO-family methods, GRPO, DeepSeek-R1 and DAPO, RLVR, financial tool-calling GRPO, policy distillation, sandboxed training, and industrial post-training practice. |
-| 10 | [Agentic RL](docs/chapter10_agentic_rl/intro.md) | Multi-turn credit assignment, tool-use trajectories, agent evaluation, SWE/DeepCoder/FinQA-style labs, Deep Research agents, and end-to-end agentic training systems. |
-| Summary | [Part 3 Summary](docs/summaries/part3-summary.md) | What changes when RL is applied to language models, tools, and multi-step agent behavior. |
+| Chapter | Main Topic                                                   | What It Covers                                                                                                                                                        |
+| :------ | :----------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 08      | [The Full RLHF Pipeline](docs/chapter08_rlhf/intro.md)       | SFT, reward modeling, PPO-style RLHF, evaluation, scaling, and reward hacking.                                                                                        |
+| 09      | [Post-Training Alignment](docs/chapter09_alignment/intro.md) | DPO-family methods, GRPO, DeepSeek-R1 and DAPO, RLVR, financial tool-calling GRPO, policy distillation, sandboxed training, and industrial post-training practice.    |
+| 10      | [Agentic RL](docs/chapter10_agentic_rl/intro.md)             | Multi-turn credit assignment, tool-use trajectories, agent evaluation, SWE/DeepCoder/FinQA-style labs, Deep Research agents, and end-to-end agentic training systems. |
+| Summary | [Part 3 Summary](docs/summaries/part3-summary.md)            | What changes when RL is applied to language models, tools, and multi-step agent behavior.                                                                             |
 
 ### Part 4: Frontier and Advanced Systems
 
-| Chapter | Main Topic | What It Covers |
-| :------ | :--------- | :------------- |
-| 11 | [VLM Reinforcement Learning](docs/chapter11_vlm_rl/intro.md) | VLM GRPO, visual rewards, multimodal reasoning frameworks, visual generation RL, and EasyR1 GeoQA practice. |
-| 12 | [Future Trends](docs/chapter12_future_trends/intro.md) | Embodied intelligence, model-based RL, self-play, multi-agent systems, offline RL, and scaling trends. |
-| Summary | [Part 4 Summary](docs/summaries/part4-summary.md) | Frontier directions to explore after finishing the core course. |
+| Chapter | Main Topic                                                   | What It Covers                                                                                              |
+| :------ | :----------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------- |
+| 11      | [VLM Reinforcement Learning](docs/chapter11_vlm_rl/intro.md) | VLM GRPO, visual rewards, multimodal reasoning frameworks, visual generation RL, and EasyR1 GeoQA practice. |
+| 12      | [Future Trends](docs/chapter12_future_trends/intro.md)       | Embodied intelligence, model-based RL, self-play, multi-agent systems, offline RL, and scaling trends.      |
+| Summary | [Part 4 Summary](docs/summaries/part4-summary.md)            | Frontier directions to explore after finishing the core course.                                             |
 
 ### Appendices
 
-| Appendix | Main Topic | What It Covers |
-| :------- | :--------- | :------------- |
-| A | [Training Debugging Guide](docs/appendix_common_pitfalls/intro.md) | Common RL training failures, symptoms, root causes, and fixes. |
-| B | [RL Engineering Practice](docs/appendix_industrial_training/intro.md) | Training infrastructure, agent sandboxes, parallelism, monitoring, evaluation benchmarks, metrics, and industrial exercises. |
-| C | [Handwritten Code Cheatsheet](docs/appendix_code_cheatsheet/intro.md) | Compact code notes for SFT, PPO, DPO, GRPO, sampling, attention, and DAPO. |
-| D | [Learning Resources and Reproduction Projects](docs/appendix_game_projects/intro.md) | Curated resources and reproduction projects for expanding course examples. |
-| E | [Math Foundations for Reinforcement Learning](docs/appendix_math/intro.md) | Linear algebra, probability, calculus, optimization, and information theory for RL. |
+| Appendix | Main Topic                                                                           | What It Covers                                                                                                               |
+| :------- | :----------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------- |
+| A        | [Training Debugging Guide](docs/appendix_common_pitfalls/intro.md)                   | Common RL training failures, symptoms, root causes, and fixes.                                                               |
+| B        | [RL Engineering Practice](docs/appendix_industrial_training/intro.md)                | Training infrastructure, agent sandboxes, parallelism, monitoring, evaluation benchmarks, metrics, and industrial exercises. |
+| C        | [Handwritten Code Cheatsheet](docs/appendix_code_cheatsheet/intro.md)                | Compact code notes for SFT, PPO, DPO, GRPO, sampling, attention, and DAPO.                                                   |
+| D        | [Learning Resources and Reproduction Projects](docs/appendix_game_projects/intro.md) | Curated resources and reproduction projects for expanding course examples.                                                   |
+| E        | [Math Foundations for Reinforcement Learning](docs/appendix_math/intro.md)           | Linear algebra, probability, calculus, optimization, and information theory for RL.                                          |
 
 ## Experiment Code
 

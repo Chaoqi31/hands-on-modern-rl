@@ -24,24 +24,24 @@ The previous section's Pendulum had just 1 continuous action and a 3-dimensional
    ___   ___       ← feet
 ```
 
-| Property      | Value                                                                            |
-| ------------- | -------------------------------------------------------------------------------- |
-| State dim     | 24 (torso angle, angular velocity, joint states, 10 lidar distance readings)    |
-| Action dim    | 4 (torques at left hip, left knee, right hip, right knee; continuous $[-1, 1]$) |
-| Reward        | forward progress + survival penalty - energy cost                                |
-| Termination   | falling (head touches ground) or reaching the goal                               |
-| "Solved" bar  | average return > 300                                                             |
+| Property     | Value                                                                           |
+| ------------ | ------------------------------------------------------------------------------- |
+| State dim    | 24 (torso angle, angular velocity, joint states, 10 lidar distance readings)    |
+| Action dim   | 4 (torques at left hip, left knee, right hip, right knee; continuous $[-1, 1]$) |
+| Reward       | forward progress + survival penalty - energy cost                               |
+| Termination  | falling (head touches ground) or reaching the goal                              |
+| "Solved" bar | average return > 300                                                            |
 
 The core challenge of BipedalWalker is **coordination**: all four joints must apply force correctly and simultaneously. A single joint moving out of sync can cause a fall.
 
 The real difficulty going from Pendulum to BipedalWalker is not just the state dimension growing from 3 to 24 or the action dimension from 1 to 4. What makes it genuinely harder is that the policy must discover **temporal coordination** across four joints — lifting the left foot, shifting the center of mass, bringing the right foot through. This is not simply "output the correct torque at each joint"; it is an entire gait cycle.
 
-|             | Pendulum     | BipedalWalker                  |
-| ----------- | ------------ | ------------------------------ |
-| State dim   | 3            | 24                             |
-| Action dim  | 1            | 4                              |
-| Training    | minutes      | tens of minutes                |
-| Difficulty  | single joint | multi-joint coordination + balance |
+|            | Pendulum     | BipedalWalker                      |
+| ---------- | ------------ | ---------------------------------- |
+| State dim  | 3            | 24                                 |
+| Action dim | 1            | 4                                  |
+| Training   | minutes      | tens of minutes                    |
+| Difficulty | single joint | multi-joint coordination + balance |
 
 ## 6.6.2 Running Training
 
@@ -88,15 +88,15 @@ Compared to the Pendulum configuration, the main changes are increasing parallel
 
 The training script saves models, checkpoints, and training curves to the `output/` directory:
 
-| File                                            | Description               |
-| ----------------------------------------------- | ------------------------- |
-| `actor_critic_bipedalwalker.zip`                | trained A2C model         |
-| `actor_critic_bipedalwalker_500k.zip`           | 500k-step checkpoint      |
-| `actor_critic_bipedalwalker_1000k.zip`          | 1M-step checkpoint        |
-| `actor_critic_bipedalwalker_2000k.zip`          | 2M-step checkpoint        |
-| `actor_critic_bipedalwalker_reward.png`         | episode reward curve      |
-| `actor_critic_bipedalwalker_entropy.png`        | policy entropy loss curve |
-| `actor_critic_bipedalwalker_loss.png`           | Actor/Critic loss curves  |
+| File                                     | Description               |
+| ---------------------------------------- | ------------------------- |
+| `actor_critic_bipedalwalker.zip`         | trained A2C model         |
+| `actor_critic_bipedalwalker_500k.zip`    | 500k-step checkpoint      |
+| `actor_critic_bipedalwalker_1000k.zip`   | 1M-step checkpoint        |
+| `actor_critic_bipedalwalker_2000k.zip`   | 2M-step checkpoint        |
+| `actor_critic_bipedalwalker_reward.png`  | episode reward curve      |
+| `actor_critic_bipedalwalker_entropy.png` | policy entropy loss curve |
+| `actor_critic_bipedalwalker_loss.png`    | Actor/Critic loss curves  |
 
 ## 6.6.3 Training Results: Standing First, Then Struggling to Walk
 
@@ -175,24 +175,24 @@ At 3M steps the policy has developed a relatively stable gait. Most episodes sco
 
 Evaluation comparison across the three phases (20-episode average):
 
-| Training Steps | Mean Reward | Std    | Behavior                                              |
-| -------------- | ----------- | ------ | ----------------------------------------------------- |
-| 500k           | -50.0       | 5.7    | Stands but does not walk; every episode runs 1600 steps |
-| 2M             | -66.4       | 97.0   | Highly unstable: ~15% of episodes walk, rest fall     |
-| 3M             | 221.8       | 107.6  | Most episodes score 270+, but 10–15% still fall       |
+| Training Steps | Mean Reward | Std   | Behavior                                                |
+| -------------- | ----------- | ----- | ------------------------------------------------------- |
+| 500k           | -50.0       | 5.7   | Stands but does not walk; every episode runs 1600 steps |
+| 2M             | -66.4       | 97.0  | Highly unstable: ~15% of episodes walk, rest fall       |
+| 3M             | 221.8       | 107.6 | Most episodes score 270+, but 10–15% still fall         |
 
 ## 6.6.5 A2C vs PPO: Same Task, Different Stability
 
 This section and Section 7.1 of Chapter 7 use the identical environment (BipedalWalker-v3), but train with A2C and PPO respectively. Comparing the two experiments:
 
-| Metric              | A2C (this section) | PPO (Section 7.1) |
-| ------------------- | ------------------ | ------------------ |
-| Training steps      | 3M                 | 2M                 |
-| 20-episode mean reward | 221.8           | 282.5              |
-| Std                 | 107.6              | 59.7               |
-| Typical success     | 271–276            | 293–299            |
-| Fall rate           | ~15%               | ~5%                |
-| Training curve noise | severe oscillation | relatively smooth  |
+| Metric                 | A2C (this section) | PPO (Section 7.1) |
+| ---------------------- | ------------------ | ----------------- |
+| Training steps         | 3M                 | 2M                |
+| 20-episode mean reward | 221.8              | 282.5             |
+| Std                    | 107.6              | 59.7              |
+| Typical success        | 271–276            | 293–299           |
+| Fall rate              | ~15%               | ~5%               |
+| Training curve noise   | severe oscillation | relatively smooth |
 
 The two algorithms share the same core architecture: both are Actor-Critic, with the Actor outputting a Gaussian distribution and the Critic estimating $V(s)$. The key difference is the **constraint mechanism on policy updates**:
 
@@ -227,13 +227,13 @@ model = A2C(
 
 Common tuning reference:
 
-| Parameter        | This section  | What happens if it's off                                |
-| ---------------- | ------------- | ------------------------------------------------------- |
-| `learning_rate`  | `7e-4`        | Too large → violent oscillation; too small → slow learning |
-| `n_steps`        | `32`          | Too short → noisy advantages; too long → infrequent updates |
-| `num_envs`       | `16`          | Too few → unstable gradients; too many → overhead on a single machine |
-| `net_arch`       | `[128, 128]`  | Too small → can't express complex gaits; too large → slower training |
-| `gamma`          | `0.99`        | Too low → only focuses on short-term survival, ignores long-term walking efficiency |
+| Parameter       | This section | What happens if it's off                                                            |
+| --------------- | ------------ | ----------------------------------------------------------------------------------- |
+| `learning_rate` | `7e-4`       | Too large → violent oscillation; too small → slow learning                          |
+| `n_steps`       | `32`         | Too short → noisy advantages; too long → infrequent updates                         |
+| `num_envs`      | `16`         | Too few → unstable gradients; too many → overhead on a single machine               |
+| `net_arch`      | `[128, 128]` | Too small → can't express complex gaits; too large → slower training                |
+| `gamma`         | `0.99`       | Too low → only focuses on short-term survival, ignores long-term walking efficiency |
 
 ## Section Summary
 
