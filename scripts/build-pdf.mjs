@@ -32,7 +32,7 @@ const pdfAuthor =
 const pdfBookTagline =
   '现代强化学习实战指南：涵盖经典控制、LLM 后训练、RLVR 与多模态智能体'
 const pdfBookSubtitle = '现代强化学习实战——从代码到原理'
-const pdfLogoPath = '../public/readme/logo.png'
+const pdfLogoPath = '../public/readme/readmelogo.png'
 const pdfBuildDate =
   process.env.PDF_BUILD_DATE ||
   new Intl.DateTimeFormat('zh-CN', {

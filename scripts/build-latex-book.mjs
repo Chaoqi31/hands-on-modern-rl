@@ -40,7 +40,7 @@ const pdfAuthors =
   process.env.PDF_AUTHORS ||
   process.env.PDF_AUTHOR ||
   `WalkingLabs; 散步 (${sanbuGithubUrl})`
-const pdfTitleLogoWidth = process.env.PDF_LOGO_WIDTH || '42mm'
+const pdfTitleLogoWidth = process.env.PDF_LOGO_WIDTH || '118mm'
 const pdfPaperWidth = process.env.PDF_PAPER_WIDTH || '210mm'
 const pdfPaperHeight = process.env.PDF_PAPER_HEIGHT || '297mm'
 const pdfBodyFontSize = process.env.PDF_BODY_FONT_SIZE || '9'
@@ -1950,7 +1950,7 @@ function optimizePdfOutput() {
 async function main() {
   prepareWorkDir()
 
-  const logoSource = path.join(docsDir, 'public', 'readme', 'logo-symbol.svg')
+  const logoSource = path.join(docsDir, 'public', 'readme', 'readmelogo.png')
   const logoAsset = fs.existsSync(logoSource) ? copyAsset(logoSource) : null
   const sidebar = await loadSidebar()
   const chunks = collectBookStructure(sidebar)
