@@ -1,8 +1,5 @@
 <div align="center">
-  <img src="docs/public/readme/readmelogo.png" alt="Hands-On Modern RL Logo" width="500" />
-  <h1>Hands-On Modern RL</h1>
-  <p><strong>A hands-on modern reinforcement learning course</strong></p>
-  <p><em>A practice-first guide to modern RL, from classic control to LLM post-training, RLVR, and multimodal agents.</em></p>
+  <img src="docs/public/readme/readmelogo.png" alt="Hands-On Modern RL" width="500" />
 
   <p>
     <a href="https://walkinglabs.github.io/hands-on-modern-rl/"><img src="https://img.shields.io/badge/Course-Online-2563eb?style=flat-square" alt="Online Course" /></a>
