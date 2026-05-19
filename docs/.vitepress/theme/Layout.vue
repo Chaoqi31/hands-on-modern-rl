@@ -2,6 +2,12 @@
 import DefaultTheme from 'vitepress/theme'
 import { useData, useRoute, withBase } from 'vitepress'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import {
+  PopoverContent,
+  PopoverPortal,
+  PopoverRoot,
+  PopoverTrigger
+} from 'reka-ui'
 import ReadingProgress from './components/ReadingProgress.vue'
 import TextType from './components/TextType.vue'
 import mediumZoom from 'medium-zoom'
@@ -33,8 +39,6 @@ const sidebarCollapsed = ref(false)
 const sidebarWidth = ref(DEFAULT_SIDEBAR_WIDTH)
 const sidebarResizing = ref(false)
 
-const readingToolsButton = ref(null)
-const readingToolsPanel = ref(null)
 const mermaidViewerOpen = ref(false)
 const mermaidViewerSrc = ref('')
 const mermaidViewerAlt = ref('')
@@ -43,6 +47,7 @@ const mermaidViewerScroll = ref(null)
 const mermaidViewerNaturalWidth = ref(0)
 const mermaidViewerNaturalHeight = ref(0)
 const mermaidViewerCustomZoom = ref(false)
+const mermaidViewerDragging = ref(false)
 
 const isHomePage = computed(() => frontmatter.value.layout === 'home')
 const showDocChrome = computed(() => !isHomePage.value)
@@ -86,10 +91,15 @@ let outlineObserver = null
 let sidebarObserver = null
 let navigationSyncTimer = null
 let zoom = null
+let mermaidViewerDragState = null
 
 const MERMAID_VIEWER_MIN_SCALE = 0.02
 const MERMAID_VIEWER_MAX_SCALE = 6
 const MERMAID_VIEWER_SCALE_STEP = 0.25
+
+const mermaidViewerScaleLabel = computed(
+  () => `${Math.round(mermaidViewerScale.value * 100)}%`
+)
 
 const mermaidViewerImageStyle = computed(() => {
   if (!mermaidViewerNaturalWidth.value) {
@@ -203,10 +213,6 @@ function toggleSidebar() {
   sidebarCollapsed.value = !sidebarCollapsed.value
 }
 
-function toggleReadingTools() {
-  readingToolsOpen.value = !readingToolsOpen.value
-}
-
 function closeReadingTools() {
   readingToolsOpen.value = false
 }
@@ -242,6 +248,8 @@ function closeMermaidViewer() {
   mermaidViewerNaturalWidth.value = 0
   mermaidViewerNaturalHeight.value = 0
   mermaidViewerCustomZoom.value = false
+  mermaidViewerDragging.value = false
+  mermaidViewerDragState = null
   document.body.classList.remove('ct-mermaid-viewer-open')
 }
 
@@ -348,6 +356,65 @@ function handleMermaidViewerWheel(event) {
   setMermaidViewerScale(mermaidViewerScale.value * factor, event)
 }
 
+function handleMermaidViewerPointerDown(event) {
+  if (!mermaidViewerOpen.value || event.button !== 0) return
+  const scroll = mermaidViewerScroll.value
+  if (!scroll) return
+
+  mermaidViewerDragState = {
+    pointerId: event.pointerId,
+    startX: event.clientX,
+    startY: event.clientY,
+    scrollLeft: scroll.scrollLeft,
+    scrollTop: scroll.scrollTop
+  }
+  mermaidViewerDragging.value = true
+  event.currentTarget.setPointerCapture?.(event.pointerId)
+  event.preventDefault()
+}
+
+function handleMermaidViewerPointerMove(event) {
+  const scroll = mermaidViewerScroll.value
+  const drag = mermaidViewerDragState
+  if (!scroll || !drag || drag.pointerId !== event.pointerId) return
+
+  scroll.scrollLeft = drag.scrollLeft - (event.clientX - drag.startX)
+  scroll.scrollTop = drag.scrollTop - (event.clientY - drag.startY)
+}
+
+function stopMermaidViewerDrag(event = null) {
+  if (event && mermaidViewerDragState?.pointerId !== event.pointerId) return
+  mermaidViewerDragging.value = false
+  mermaidViewerDragState = null
+}
+
+function handleMermaidViewerKeydown(event) {
+  if (!mermaidViewerOpen.value) return
+
+  if (event.key === 'Escape') {
+    event.preventDefault()
+    closeMermaidViewer()
+    return
+  }
+
+  if (event.key === '+' || event.key === '=') {
+    event.preventDefault()
+    zoomMermaidViewer(MERMAID_VIEWER_SCALE_STEP)
+    return
+  }
+
+  if (event.key === '-' || event.key === '_') {
+    event.preventDefault()
+    zoomMermaidViewer(-MERMAID_VIEWER_SCALE_STEP)
+    return
+  }
+
+  if (event.key === '0') {
+    event.preventDefault()
+    resetMermaidViewerZoom()
+  }
+}
+
 function handleMermaidImageClick(event) {
   const image = event.target.closest('img[data-mermaid-viewer="true"]')
   if (!image) return
@@ -437,19 +504,11 @@ function handleViewportResize() {
   }
 }
 
-function handleDocumentPointerDown(event) {
-  if (!readingToolsOpen.value) return
-
-  const target = event.target
-  if (readingToolsPanel.value?.contains(target)) return
-  if (readingToolsButton.value?.contains(target)) return
-
-  closeReadingTools()
-}
-
 function handleWindowKeydown(event) {
+  handleMermaidViewerKeydown(event)
+  if (event.defaultPrevented) return
+
   if (event.key === 'Escape') {
-    closeMermaidViewer()
     closeReadingTools()
   }
 }
@@ -607,7 +666,6 @@ onMounted(() => {
   document.body.classList.toggle('ct-sidebar-collapsed', sidebarCollapsed.value)
 
   window.addEventListener('resize', handleViewportResize)
-  document.addEventListener('pointerdown', handleDocumentPointerDown)
   window.addEventListener('keydown', handleWindowKeydown)
   initNavigationSync()
   updateSidebarEdgePosition()
@@ -623,7 +681,6 @@ onBeforeUnmount(() => {
   cleanupMermaidViewer()
   closeMermaidViewer()
   window.removeEventListener('resize', handleViewportResize)
-  document.removeEventListener('pointerdown', handleDocumentPointerDown)
   window.removeEventListener('keydown', handleWindowKeydown)
 })
 
@@ -667,102 +724,106 @@ watch(
   <DefaultTheme.Layout>
     <template v-if="showDocChrome" #nav-bar-content-after>
       <div class="ct-reading-tools">
-        <button
-          ref="readingToolsButton"
-          class="ct-reading-tools-button"
-          type="button"
-          aria-label="阅读设置"
-          :aria-expanded="readingToolsOpen ? 'true' : 'false'"
-          @click="toggleReadingTools"
-        >
-          <span>Aa</span>
-        </button>
+        <PopoverRoot v-model:open="readingToolsOpen">
+          <PopoverTrigger as-child>
+            <button
+              class="ct-reading-tools-button"
+              type="button"
+              aria-label="阅读设置"
+            >
+              <span>Aa</span>
+            </button>
+          </PopoverTrigger>
 
-        <Transition name="ct-reading-tools-fade">
-          <div
-            v-if="readingToolsOpen"
-            ref="readingToolsPanel"
-            class="ct-reading-tools-panel"
-          >
-            <div class="ct-reading-tools-group">
-              <div class="ct-reading-tools-header">
-                <div class="ct-reading-tools-title">字号</div>
-                <div class="ct-reading-tools-value">{{ fontSize }}px</div>
-              </div>
-              <div class="ct-reading-tools-actions">
-                <button
-                  class="ct-reading-tools-action"
-                  type="button"
-                  @click="decreaseFontSize"
-                >
-                  A-
-                </button>
-                <button
-                  class="ct-reading-tools-action"
-                  type="button"
-                  @click="resetFontSize"
-                >
-                  默认
-                </button>
-                <button
-                  class="ct-reading-tools-action"
-                  type="button"
-                  @click="increaseFontSize"
-                >
-                  A+
-                </button>
-              </div>
-              <input
-                v-model="fontSize"
-                class="ct-reading-tools-range"
-                type="range"
-                :min="MIN_FONT_SIZE"
-                :max="MAX_FONT_SIZE"
-                step="1"
-              />
-            </div>
-
-            <div class="ct-reading-tools-group">
-              <div class="ct-reading-tools-header">
-                <div class="ct-reading-tools-title">行距</div>
-                <div class="ct-reading-tools-value">
-                  {{ lineHeight.toFixed(2) }}
+          <PopoverPortal>
+            <Transition name="ct-reading-tools-fade">
+              <PopoverContent
+                class="ct-reading-tools-panel"
+                :side-offset="10"
+                align="end"
+                side="bottom"
+              >
+                <div class="ct-reading-tools-group">
+                  <div class="ct-reading-tools-header">
+                    <div class="ct-reading-tools-title">字号</div>
+                    <div class="ct-reading-tools-value">{{ fontSize }}px</div>
+                  </div>
+                  <div class="ct-reading-tools-actions">
+                    <button
+                      class="ct-reading-tools-action"
+                      type="button"
+                      @click="decreaseFontSize"
+                    >
+                      A-
+                    </button>
+                    <button
+                      class="ct-reading-tools-action"
+                      type="button"
+                      @click="resetFontSize"
+                    >
+                      默认
+                    </button>
+                    <button
+                      class="ct-reading-tools-action"
+                      type="button"
+                      @click="increaseFontSize"
+                    >
+                      A+
+                    </button>
+                  </div>
+                  <input
+                    v-model="fontSize"
+                    class="ct-reading-tools-range"
+                    type="range"
+                    :min="MIN_FONT_SIZE"
+                    :max="MAX_FONT_SIZE"
+                    step="1"
+                  />
                 </div>
-              </div>
-              <div class="ct-reading-tools-actions">
-                <button
-                  class="ct-reading-tools-action"
-                  type="button"
-                  @click="lineHeight = clampLineHeight(lineHeight - 0.05)"
-                >
-                  更紧
-                </button>
-                <button
-                  class="ct-reading-tools-action"
-                  type="button"
-                  @click="resetLineHeight"
-                >
-                  默认
-                </button>
-                <button
-                  class="ct-reading-tools-action"
-                  type="button"
-                  @click="lineHeight = clampLineHeight(lineHeight + 0.05)"
-                >
-                  更松
-                </button>
-              </div>
-              <input
-                v-model="lineHeight"
-                class="ct-reading-tools-range"
-                type="range"
-                :min="MIN_LINE_HEIGHT"
-                :max="MAX_LINE_HEIGHT"
-                step="0.05"
-              />
-            </div>
-          </div>
-        </Transition>
+
+                <div class="ct-reading-tools-group">
+                  <div class="ct-reading-tools-header">
+                    <div class="ct-reading-tools-title">行距</div>
+                    <div class="ct-reading-tools-value">
+                      {{ lineHeight.toFixed(2) }}
+                    </div>
+                  </div>
+                  <div class="ct-reading-tools-actions">
+                    <button
+                      class="ct-reading-tools-action"
+                      type="button"
+                      @click="lineHeight = clampLineHeight(lineHeight - 0.05)"
+                    >
+                      更紧
+                    </button>
+                    <button
+                      class="ct-reading-tools-action"
+                      type="button"
+                      @click="resetLineHeight"
+                    >
+                      默认
+                    </button>
+                    <button
+                      class="ct-reading-tools-action"
+                      type="button"
+                      @click="lineHeight = clampLineHeight(lineHeight + 0.05)"
+                    >
+                      更松
+                    </button>
+                  </div>
+                  <input
+                    v-model="lineHeight"
+                    class="ct-reading-tools-range"
+                    type="range"
+                    :min="MIN_LINE_HEIGHT"
+                    :max="MAX_LINE_HEIGHT"
+                    step="0.05"
+                  />
+                </div>
+              </PopoverContent>
+            </Transition>
+          </PopoverPortal>
+        </PopoverRoot>
       </div>
     </template>
 
@@ -850,31 +911,45 @@ watch(
         @click.self="closeMermaidViewer"
       >
         <div class="ct-mermaid-viewer-toolbar">
-          <button
-            type="button"
-            @click="zoomMermaidViewer(-MERMAID_VIEWER_SCALE_STEP)"
-          >
-            -
-          </button>
-          <button type="button" @click="resetMermaidViewerZoom">重置</button>
-          <button
-            type="button"
-            @click="zoomMermaidViewer(MERMAID_VIEWER_SCALE_STEP)"
-          >
-            +
-          </button>
-          <button
-            type="button"
-            aria-label="关闭图表"
-            @click="closeMermaidViewer"
-          >
-            关闭
-          </button>
+          <div class="ct-mermaid-viewer-help">
+            <strong>{{ mermaidViewerScaleLabel }}</strong>
+            <span>滚轮缩放 · 拖拽移动 · + / - 缩放 · 0 重置 · Esc 关闭</span>
+          </div>
+          <div class="ct-mermaid-viewer-actions">
+            <button
+              type="button"
+              aria-label="缩小图表"
+              @click="zoomMermaidViewer(-MERMAID_VIEWER_SCALE_STEP)"
+            >
+              -
+            </button>
+            <button type="button" @click="resetMermaidViewerZoom">重置</button>
+            <button
+              type="button"
+              aria-label="放大图表"
+              @click="zoomMermaidViewer(MERMAID_VIEWER_SCALE_STEP)"
+            >
+              +
+            </button>
+            <button
+              type="button"
+              aria-label="关闭图表"
+              @click="closeMermaidViewer"
+            >
+              关闭
+            </button>
+          </div>
         </div>
         <div
           ref="mermaidViewerScroll"
           class="ct-mermaid-viewer-scroll"
+          :class="{ 'is-dragging': mermaidViewerDragging }"
           @click.self="closeMermaidViewer"
+          @pointerdown="handleMermaidViewerPointerDown"
+          @pointermove="handleMermaidViewerPointerMove"
+          @pointerup="stopMermaidViewerDrag"
+          @pointercancel="stopMermaidViewerDrag"
+          @pointerleave="stopMermaidViewerDrag"
           @wheel="handleMermaidViewerWheel"
         >
           <div
@@ -888,7 +963,7 @@ watch(
               :alt="mermaidViewerAlt"
               :style="mermaidViewerImageStyle"
               @load="handleMermaidViewerImageLoad"
-              @click="closeMermaidViewer"
+              @dragstart.prevent
             />
           </div>
         </div>
@@ -1316,12 +1391,43 @@ watch(
 
 .ct-mermaid-viewer-toolbar {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: space-between;
   gap: 8px;
-  padding: 12px;
+  min-width: 0;
+  padding: 10px 12px;
 }
 
-.ct-mermaid-viewer-toolbar button {
+.ct-mermaid-viewer-help {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.ct-mermaid-viewer-help strong {
+  flex: 0 0 auto;
+  min-width: 44px;
+  color: #fff;
+  font-weight: 700;
+}
+
+.ct-mermaid-viewer-help span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ct-mermaid-viewer-actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8px;
+}
+
+.ct-mermaid-viewer-actions button {
   height: 34px;
   min-width: 44px;
   padding: 0 12px;
@@ -1333,13 +1439,20 @@ watch(
   cursor: pointer;
 }
 
-.ct-mermaid-viewer-toolbar button:hover {
+.ct-mermaid-viewer-actions button:hover {
   background: #fff;
 }
 
 .ct-mermaid-viewer-scroll {
   overflow: auto;
-  padding: 12px 24px 32px;
+  padding: 24px;
+  cursor: grab;
+  overscroll-behavior: contain;
+  user-select: none;
+}
+
+.ct-mermaid-viewer-scroll.is-dragging {
+  cursor: grabbing;
 }
 
 .ct-mermaid-viewer-stage {
@@ -1358,7 +1471,10 @@ watch(
   max-height: none;
   height: auto;
   background: #fff;
-  cursor: zoom-out;
+  cursor: inherit;
+  user-select: none;
+  -webkit-user-drag: none;
+  touch-action: none;
 }
 
 .main img {
@@ -1368,5 +1484,24 @@ watch(
 
 .main img:not(.ct-mermaid-viewer-image):hover {
   transform: scale(1.01);
+}
+
+@media (max-width: 640px) {
+  .ct-mermaid-viewer-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .ct-mermaid-viewer-help span {
+    white-space: normal;
+  }
+
+  .ct-mermaid-viewer-actions {
+    width: 100%;
+  }
+
+  .ct-mermaid-viewer-actions button {
+    flex: 1 1 0;
+  }
 }
 </style>
