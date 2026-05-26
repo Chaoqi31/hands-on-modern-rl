@@ -59,11 +59,15 @@
   --surface-tertiary: #fafafa;
   --surface-quaternary: #f0f0f2;
 
-  --sidebar-bg: var(--surface-secondary);
-  --sidebar-text: #86868b;
-  --sidebar-active: #1d1d1f;
-  --sidebar-hover-bg: rgba(63, 81, 181, 0.04);
-  --sidebar-border: rgba(0, 0, 0, 0.04);
+  --bg-app: #f5f7fa;
+
+  --sidebar-bg: transparent;
+  --sidebar-text: #b8b8be;
+  --sidebar-text-primary: #8e8e93;
+  --sidebar-active: #172033;
+  --sidebar-hover-bg: rgba(0, 0, 0, 0.03);
+  --sidebar-active-bg: rgba(0, 0, 0, 0.04);
+  --sidebar-border: transparent;
 
   --code-bg: rgba(63, 81, 181, 0.05);
   --code-text: #1d1d1f;
@@ -98,11 +102,15 @@
   --surface-tertiary: #2c2c2e;
   --surface-quaternary: #3a3a3c;
 
-  --sidebar-bg: var(--surface-secondary);
-  --sidebar-text: #98989d;
-  --sidebar-active: #f5f5f7;
-  --sidebar-hover-bg: rgba(63, 81, 181, 0.08);
-  --sidebar-border: rgba(255, 255, 255, 0.04);
+  --bg-app-dark: #0f1219;
+
+  --sidebar-bg: transparent;
+  --sidebar-text: #4b5563;
+  --sidebar-text-primary: #64748b;
+  --sidebar-active: #e2e8f0;
+  --sidebar-hover-bg: rgba(255, 255, 255, 0.03);
+  --sidebar-active-bg: rgba(255, 255, 255, 0.05);
+  --sidebar-border: transparent;
 
   --code-bg: rgba(63, 81, 181, 0.1);
   --code-text: #f5f5f7;
@@ -134,19 +142,28 @@
 
 /* ---- 页面内容区背景层次 ---- */
 .VPDoc {
-  background: linear-gradient(
-    180deg,
-    rgba(63, 81, 181, 0.02) 0%,
-    transparent 400px
-  );
+  background: var(--bg-app, #f5f7fa);
 }
 
 .dark .VPDoc {
-  background: linear-gradient(
-    180deg,
-    rgba(63, 81, 181, 0.03) 0%,
-    transparent 400px
-  );
+  background: var(--bg-app-dark, #0f1219);
+}
+
+/* 内容卡片容器：视觉聚焦 */
+.VPDoc .content-container {
+  max-width: 860px !important;
+  margin: 0 auto;
+  padding: 48px 56px 80px !important;
+  border-radius: var(--radius-2xl);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.dark .VPDoc .content-container {
+  background: rgba(22, 27, 38, 0.88);
+  border-color: rgba(255, 255, 255, 0.04);
+  box-shadow: none;
 }
 
 /* ===================================================
@@ -639,10 +656,36 @@
 /* ===================================================
    4. Sidebar (Easy-Vibe compact book navigation)
    =================================================== */
-.VPSidebar {
-  background-color: var(--sidebar-bg) !important;
-  border-right: 1px solid var(--sidebar-border);
+aside.VPSidebar {
+  background-color: transparent !important;
+  border-right: none;
   font-family: var(--font-sans);
+  opacity: 0.75;
+  transition: opacity 0.3s ease;
+}
+
+aside.VPSidebar:hover {
+  opacity: 1;
+}
+
+/* Make sidebar footer stick to the bottom */
+.VPSidebar .curtain {
+  display: none !important;
+}
+
+.VPSidebar > .nav {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.VPSidebar > .nav > .group {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.ct-sidebar-footer {
+  margin-top: auto;
 }
 
 /* Sidebar scrollbar */
@@ -671,26 +714,27 @@
 }
 
 :where(html) .VPSidebar .group + .group {
-  border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
-  margin-top: 6px !important;
-  padding-top: 10px !important;
+  border-top: 1px solid rgba(0, 0, 0, 0.035) !important;
+  margin-top: 8px !important;
+  padding-top: 12px !important;
 }
 
 .dark :where(html) .VPSidebar .group + .group {
-  border-top-color: rgba(255, 255, 255, 0.07) !important;
+  border-top-color: rgba(255, 255, 255, 0.05) !important;
 }
 
 :where(html) .VPSidebar .group-title {
   padding: 0 18px 8px !important;
-  color: rgba(47, 49, 55, 0.58);
-  font-size: 0.79rem;
-  font-weight: 560;
+  color: #aeaeb2;
+  font-size: 0.72rem;
+  font-weight: 720;
   line-height: 1.3 !important;
-  letter-spacing: 0;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .dark :where(html) .VPSidebar .group-title {
-  color: rgba(245, 245, 247, 0.56);
+  color: #64748b;
 }
 
 :where(html) .VPSidebarItem.level-0,
@@ -733,8 +777,8 @@
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
   color: var(--sidebar-text) !important;
   transition:
-    color 0.2s ease,
-    background-color 0.2s ease;
+    color 0.15s ease,
+    background-color 0.15s ease;
 }
 
 :where(html) .VPSidebarItem .VPLink,
@@ -760,27 +804,28 @@
 }
 
 :where(html) .VPSidebarItem.level-0 .text {
-  color: rgba(47, 49, 55, 0.56);
+  color: #8e8e93;
   font-size: 0.8rem;
-  font-weight: 520;
+  font-weight: 720;
+  letter-spacing: 0.02em;
 }
 
 :where(html) .VPSidebarItem.level-1 .text,
 :where(html) .VPSidebarItem.level-2 .text,
 :where(html) .VPSidebarItem.level-3 .text {
-  color: rgba(47, 49, 55, 0.5);
+  color: var(--sidebar-text);
   font-size: 0.78rem;
-  font-weight: 450;
+  font-weight: 500;
 }
 
 .dark :where(html) .VPSidebarItem.level-0 .text {
-  color: rgba(245, 245, 247, 0.58);
+  color: #64748b;
 }
 
 .dark :where(html) .VPSidebarItem.level-1 .text,
 .dark :where(html) .VPSidebarItem.level-2 .text,
 .dark :where(html) .VPSidebarItem.level-3 .text {
-  color: rgba(245, 245, 247, 0.5);
+  color: var(--sidebar-text);
 }
 
 :where(html) .VPSidebarItem .items,
@@ -793,28 +838,28 @@
 }
 
 :where(html) .VPSidebarItem .link:hover {
-  color: rgba(49, 82, 212, 0.72) !important;
+  color: var(--sidebar-text-primary) !important;
   background: var(--sidebar-hover-bg);
 }
 
 :where(html) .VPSidebarItem .link.is-active {
-  color: rgba(49, 82, 212, 0.8) !important;
-  font-weight: 520;
-  background: rgba(63, 81, 181, 0.035);
+  color: var(--sidebar-text-primary) !important;
+  font-weight: 600;
+  background: var(--sidebar-active-bg);
 }
 
 :where(html) .VPSidebarItem .link.is-active .text {
   color: currentcolor !important;
-  font-weight: 520 !important;
+  font-weight: 600 !important;
 }
 
 .dark :where(html) .VPSidebarItem .link:hover {
-  color: rgba(174, 184, 255, 0.76) !important;
+  color: var(--sidebar-text-primary) !important;
 }
 
 .dark :where(html) .VPSidebarItem .link.is-active {
-  color: rgba(174, 184, 255, 0.82) !important;
-  background: rgba(121, 134, 203, 0.08);
+  color: var(--sidebar-text-primary) !important;
+  background: var(--sidebar-active-bg);
 }
 
 :where(html) .VPSidebarItem .caret {
@@ -824,6 +869,71 @@
 
 :where(html) .VPSidebarItem .item:hover .caret {
   opacity: 0.8;
+}
+
+/* ---- Sidebar Footer (ref: modern-llm-notebook) ---- */
+.ct-sidebar-footer {
+  padding: 12px 16px 16px;
+  margin-top: 8px;
+  flex-shrink: 0;
+}
+
+.ct-sidebar-footer-divider {
+  height: 1px;
+  background: var(--sidebar-border);
+  margin-bottom: 12px;
+}
+
+.ct-sidebar-footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2px;
+}
+
+.ct-sidebar-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.ct-sidebar-footer-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--sidebar-text);
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.ct-sidebar-footer-btn:hover {
+  color: var(--sidebar-text-primary);
+  background: var(--sidebar-hover-bg);
+}
+
+.ct-sidebar-footer-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  color: var(--sidebar-text);
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.ct-sidebar-footer-link:hover {
+  color: var(--sidebar-text-primary);
+  background: var(--sidebar-hover-bg);
 }
 
 /* ===================================================
@@ -1498,33 +1608,37 @@ mjx-container[display='true'] {
 }
 
 .VPDocAsideOutline .content {
-  border-left: 0 !important;
+  border-left: 1px solid rgba(0, 0, 0, 0.075) !important;
   border-radius: 0;
-  padding: 2px 0 2px 14px !important;
+  padding: 2px 0 2px 12px !important;
   background: transparent;
   box-shadow: none;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
 
+.VPDocAsideOutline .VPDocOutlineItem.root > ul {
+  padding-left: 0;
+}
+
 .VPDocAsideOutline .outline-title {
   margin: 0 0 10px;
   padding: 0;
   line-height: 1.4;
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: #a1a1a6;
-  text-transform: none;
+  font-size: 0.85rem;
+  font-weight: 650;
+  color: #1d1d1f;
   letter-spacing: 0;
 }
 
 .dark .VPDocAsideOutline .outline-title {
-  color: #8e8e93;
+  color: #e2e8f0;
 }
 
 .dark .VPDocAsideOutline .content {
   background: transparent;
   box-shadow: none;
+  border-left-color: rgba(255, 255, 255, 0.1) !important;
 }
 
 /* Hide VitePress default outline marker bar */
@@ -1544,9 +1658,9 @@ mjx-container[display='true'] {
 .VPDocAsideOutline .VPDocOutlineItem .outline-link {
   display: block;
   position: relative;
-  padding: 5px 0 5px 10px;
+  padding: 6px 10px 6px 0;
   min-height: 28px;
-  line-height: 1.35;
+  line-height: 1.45;
   white-space: normal;
   overflow: visible;
   text-overflow: clip;
@@ -1554,30 +1668,35 @@ mjx-container[display='true'] {
   word-break: break-word;
   border-left: 0;
   border-radius: var(--radius-sm);
-  font-size: 0.8rem;
-  color: #8e8e93;
-  transition: all 0.2s ease;
+  font-size: 12.5px;
+  color: #515154;
+  transition: background 0.16s ease, color 0.16s ease;
 }
 
 .VPDocAsideOutline .VPDocOutlineItem.nested {
-  padding-left: 8px;
+  padding-left: 0;
   padding-right: 0;
+}
+
+.VPDocAsideOutline .VPDocOutlineItem.nested .outline-link {
+  padding-left: 12px;
+  font-size: 12px;
 }
 
 /* Hover */
 .VPDocAsideOutline .VPDocOutlineItem .outline-link:hover,
 .VPDocAsideOutline .VPDocOutlineItem .outline-link:focus-visible {
-  color: #3a3a3c;
-  background: transparent;
+  color: #1d1d1f;
+  background: rgba(0, 0, 0, 0.03);
 }
 
 /* Active */
 .VPDocAsideOutline .VPDocOutlineItem .outline-link.active {
   margin: 0;
-  padding: 5px 0 5px 10px;
-  color: var(--vp-c-brand-2);
-  font-weight: 600;
-  background: transparent;
+  padding: 6px 10px 6px 0;
+  color: var(--vp-c-brand-1);
+  font-weight: 650;
+  background: rgba(63, 81, 181, 0.06);
   box-shadow: none;
   transform: none;
   border-left: 0;
@@ -1589,21 +1708,22 @@ mjx-container[display='true'] {
   position: absolute;
   top: 8px;
   bottom: 8px;
-  left: 0;
+  left: -12px;
   width: 2px;
   border-radius: var(--radius-full);
-  background: currentcolor;
+  background: var(--vp-c-brand-1);
   opacity: 0.72;
 }
 
 .dark .VPDocAsideOutline .VPDocOutlineItem .outline-link:hover,
 .dark .VPDocAsideOutline .VPDocOutlineItem .outline-link:focus-visible {
   color: #f5f5f7;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .dark .VPDocAsideOutline .VPDocOutlineItem .outline-link.active {
-  background: var(--vp-c-brand-soft);
+  color: #60a5fa;
+  background: rgba(96, 165, 250, 0.1);
   box-shadow: none;
 }
 

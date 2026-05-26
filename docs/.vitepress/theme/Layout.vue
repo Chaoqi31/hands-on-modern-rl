@@ -10,6 +10,7 @@ import {
 } from 'reka-ui'
 import { HandHeart, Moon, Settings, Sun } from 'lucide-vue-next'
 import ReadingProgress from './components/ReadingProgress.vue'
+import SidebarFooter from './components/SidebarFooter.vue'
 import TextType from './components/TextType.vue'
 import mediumZoom from 'medium-zoom'
 import { initGithubStars } from './githubStars.js'
@@ -1021,6 +1022,10 @@ watch(
           </PopoverPortal>
         </PopoverRoot>
       </div>
+    </template>
+
+    <template v-if="showDocChrome" #sidebar-nav-after>
+      <SidebarFooter @open-settings="readingToolsOpen = true" />
     </template>
 
     <template v-if="isHomePage && homeTypingText" #home-hero-info-after>

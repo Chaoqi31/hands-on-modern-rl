@@ -1826,7 +1826,7 @@ export default defineConfig({
         },
         outline: {
           level: [2, 3],
-          label: 'Outline'
+          label: '大纲'
         },
         lastUpdated: {
           text: '最后更新'
@@ -1871,7 +1871,7 @@ export default defineConfig({
         },
         outline: {
           level: [2, 3],
-          label: 'Outline'
+          label: '大纲'
         },
         lastUpdated: {
           text: 'Last updated'
@@ -1924,7 +1924,7 @@ export default defineConfig({
     },
     outline: {
       level: [2, 3],
-      label: '本页目录'
+      label: '大纲'
     }
   }
 })
