@@ -372,6 +372,33 @@ function katexMarkdown(md) {
   rescueMathInInline(md)
 }
 
+function footnoteTitlePlugin(md) {
+  md.renderer.rules.footnote_block_open = (tokens, idx, options, env) => {
+    const previousContentToken = [...tokens]
+      .slice(0, idx)
+      .reverse()
+      .find((token) => token.type === 'inline' && token.content?.trim())
+    const previousContent = (previousContentToken?.content || '')
+      .replace(/[*_`#]/g, '')
+      .trim()
+    const hasManualTitle = /^(参考文献|References)[:：]?$/.test(
+      previousContent
+    )
+    const title = env.relativePath?.startsWith('en/')
+      ? 'References'
+      : '参考文献'
+    const heading = hasManualTitle
+      ? ''
+      : `<div class="footnotes-title">${title}</div>\n`
+
+    const separator = options.xhtmlOut
+      ? '<hr class="footnotes-sep" />\n'
+      : '<hr class="footnotes-sep">\n'
+
+    return `${separator}<section class="footnotes">\n${heading}<ol class="footnotes-list">\n`
+  }
+}
+
 function safeHeadingAttrs(md) {
   md.core.ruler.before('linkify', 'safe_heading_attrs', (state) => {
     for (let idx = 0; idx < state.tokens.length - 1; idx += 1) {
@@ -1746,6 +1773,7 @@ export default defineConfig({
       safeHeadingAttrs(md)
       optimizedImagesPlugin(md)
       md.use(markdownItFootnote)
+      footnoteTitlePlugin(md)
       katexMarkdown(md)
       MermaidMarkdown(md)
       optimizedMermaidPlugin(md)
