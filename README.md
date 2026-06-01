@@ -397,11 +397,11 @@ Our team has also created other courses. Take a look:
 
 [![LEARN HARNESS ENGINEERING](https://img.shields.io/badge/LEARN_HARNESS_ENGINEERING-0052cc?style=for-the-badge)](https://github.com/walkinglabs/learn-harness-engineering)
 
-## WeChat Group (微信)
+## Discussion Group (微信)
 
-For suggestions or feedback, scan the QR code to join the WeChat group (微信):
+For suggestions or feedback, scan the QR code to join the discussion group (微信):
 
-<img src="https://github.com/walkinglabs/.github/raw/main/profile/wechat.png" alt="WeChat Group" width="300" />
+<img src="https://github.com/walkinglabs/.github/raw/main/profile/wechat.png" alt="Discussion Group" width="300" />
 
 ## Citation
 

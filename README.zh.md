@@ -16,7 +16,7 @@
   </p>
 
   <p>
-    <a href="#wechat-group-微信">WeChat Group (微信)</a>
+    <a href="#读者交流群微信">读者交流群（微信）</a>
   </p>
 
   <p>
