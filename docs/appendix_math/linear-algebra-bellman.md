@@ -15,13 +15,13 @@ $$
 这行公式处理一个状态没有问题。但当环境包含 $n$ 个状态时，需要 $n$ 个这样的方程，每个状态一个。将这 $n$ 个方程合并，可以得到单一的矩阵表达：
 
 $$
-\boxed{\boldsymbol{v} = \boldsymbol{r} + \gamma P\boldsymbol{v}}
+\boxed{\mathbf{v} = \mathbf{r} + \gamma P\mathbf{v}}
 $$
 
-其中 $\boldsymbol{v}$ 是所有状态的价值向量，$\boldsymbol{r}$ 是所有状态的即时奖励，$P$ 是状态转移矩阵。移项后还可以得到闭式解：
+其中 $\mathbf{v}$ 是所有状态的价值向量，$\mathbf{r}$ 是所有状态的即时奖励，$P$ 是状态转移矩阵。移项后还可以得到闭式解：
 
 $$
-\boxed{\boldsymbol{v} = (I - \gamma P)^{-1}\boldsymbol{r}}
+\boxed{\mathbf{v} = (I - \gamma P)^{-1}\mathbf{r}}
 $$
 
 下面从单个方程出发，分三步推导出这两个公式：先将价值写成向量，再将转移关系写成矩阵，最后拼成方程组并求解。
@@ -39,20 +39,20 @@ $$
 两个状态的价值分别是 $v_1$ 和 $v_2$。将所有状态的价值排成一列向量：
 
 $$
-\boldsymbol{v} =
+\mathbf{v} =
 \begin{bmatrix}
 v_1 \\
 v_2
 \end{bmatrix},
 \qquad
-\boldsymbol{r} =
+\mathbf{r} =
 \begin{bmatrix}
 2 \\
 1
 \end{bmatrix}.
 $$
 
-$\boldsymbol{v}$ 是待求的量，$\boldsymbol{r}$ 是已知的即时奖励。两状态时向量有两个分量；推广到 $n$ 个状态，向量就有 $n$ 个分量，写法不变。
+$\mathbf{v}$ 是待求的量，$\mathbf{r}$ 是已知的即时奖励。两状态时向量有两个分量；推广到 $n$ 个状态，向量就有 $n$ 个分量，写法不变。
 
 ---
 
@@ -68,10 +68,10 @@ P =
 \end{bmatrix}.
 $$
 
-矩阵的行对应"从哪个状态出发"，列对应"下一步到哪个状态"。矩阵乘向量的含义是：$P\boldsymbol{v}$ 的第 $i$ 行给出"从状态 $s_i$ 出发，下一步期望到达的价值"。验算如下：
+矩阵的行对应"从哪个状态出发"，列对应"下一步到哪个状态"。矩阵乘向量的含义是：$P\mathbf{v}$ 的第 $i$ 行给出"从状态 $s_i$ 出发，下一步期望到达的价值"。验算如下：
 
 $$
-P\boldsymbol{v} =
+P\mathbf{v} =
 \begin{bmatrix}
 0 & 1 \\
 1 & 0
@@ -93,7 +93,7 @@ $$
 
 ## 第三步：拼成方程组
 
-现在有了三样东西：价值向量 $\boldsymbol{v}$、奖励向量 $\boldsymbol{r}$、转移矩阵 $P$。将单个状态的贝尔曼方程逐个写出：
+现在有了三样东西：价值向量 $\mathbf{v}$、奖励向量 $\mathbf{r}$、转移矩阵 $P$。将单个状态的贝尔曼方程逐个写出：
 
 $$
 \begin{aligned}
@@ -102,10 +102,10 @@ v_2 &= 1 + 0.5v_1.
 \end{aligned}
 $$
 
-用矩阵语言重写右边：即时奖励是 $\boldsymbol{r}$，折扣后的未来价值是 $\gamma P\boldsymbol{v}$。二者相加：
+用矩阵语言重写右边：即时奖励是 $\mathbf{r}$，折扣后的未来价值是 $\gamma P\mathbf{v}$。二者相加：
 
 $$
-\boldsymbol{v} = \boldsymbol{r} + \gamma P\boldsymbol{v}.
+\mathbf{v} = \mathbf{r} + \gamma P\mathbf{v}.
 $$
 
 验证右边第一行：
@@ -124,7 +124,7 @@ $$
 
 ### 压缩有效的原理
 
-关键在于 $P\boldsymbol{v}$ 这一步。$P$ 的每一行恰好是一组转移概率（行和为 $1$），矩阵乘法恰好是"概率 $\times$ 价值"的加权平均。贝尔曼方程表述"价值 = 即时奖励 + 折扣后的未来价值"，而矩阵方程表述的是完全相同的关系——只是对**所有状态同时**进行。
+关键在于 $P\mathbf{v}$ 这一步。$P$ 的每一行恰好是一组转移概率（行和为 $1$），矩阵乘法恰好是"概率 $\times$ 价值"的加权平均。贝尔曼方程表述"价值 = 即时奖励 + 折扣后的未来价值"，而矩阵方程表述的是完全相同的关系——只是对**所有状态同时**进行。
 
 | 符号    | 含义                     | 维度  |
 | ------- | ------------------------ | ----- |
@@ -138,22 +138,22 @@ $$
 
 ## 闭式解与不动点
 
-$\boldsymbol{v} = \boldsymbol{r} + \gamma P\boldsymbol{v}$ 是一个线性方程组，因此可以直接求解。将含有 $\boldsymbol{v}$ 的项移至左边：
+$\mathbf{v} = \mathbf{r} + \gamma P\mathbf{v}$ 是一个线性方程组，因此可以直接求解。将含有 $\mathbf{v}$ 的项移至左边：
 
 $$
-\boldsymbol{v} - \gamma P\boldsymbol{v} = \boldsymbol{r}.
+\mathbf{v} - \gamma P\mathbf{v} = \mathbf{r}.
 $$
 
 提取公因子（$I$ 是单位矩阵——对角线为 $1$，其余为 $0$）：
 
 $$
-(I - \gamma P)\boldsymbol{v} = \boldsymbol{r}.
+(I - \gamma P)\mathbf{v} = \mathbf{r}.
 $$
 
 若 $I - \gamma P$ 可逆，则存在闭式解：
 
 $$
-\boldsymbol{v} = (I - \gamma P)^{-1}\boldsymbol{r}.
+\mathbf{v} = (I - \gamma P)^{-1}\mathbf{r}.
 $$
 
 代入两状态的具体数值：
@@ -209,19 +209,19 @@ $$
 
 ## 从两个状态到 $n$ 个状态
 
-上述闭式解 $\boldsymbol{v} = (I-\gamma P)^{-1}\boldsymbol{r}$ 是在两个状态下推导的。将状态数从 2 推广到任意 $n$，方程的形式保持不变：
+上述闭式解 $\mathbf{v} = (I-\gamma P)^{-1}\mathbf{r}$ 是在两个状态下推导的。将状态数从 2 推广到任意 $n$，方程的形式保持不变：
 
 $$
-\boldsymbol{v}_\pi = \boldsymbol{r}_\pi + \gamma P_\pi \boldsymbol{v}_\pi.
+\mathbf{v}_\pi = \mathbf{r}_\pi + \gamma P_\pi \mathbf{v}_\pi.
 $$
 
 其中：
 
-- $\boldsymbol{v}_\pi \in \mathbb{R}^n$：策略 $\pi$ 下所有状态的价值
-- $\boldsymbol{r}_\pi \in\mathbb{R}^n$：每个状态的期望即时奖励
+- $\mathbf{v}_\pi \in \mathbb{R}^n$：策略 $\pi$ 下所有状态的价值
+- $\mathbf{r}_\pi \in\mathbb{R}^n$：每个状态的期望即时奖励
 - $P_\pi \in\mathbb{R}^{n\times n}$：策略诱导的转移矩阵（$P_\pi[i,j] = \sum_a \pi(a\mid s_i) p(s_j\mid s_i, a)$）
 
-三个状态时，$P$ 为 $3\times3$，$\boldsymbol{v}$ 和 $\boldsymbol{r}$ 为 $3\times1$，方程 $\boldsymbol{v} = \boldsymbol{r} + \gamma P\boldsymbol{v}$ 依然成立。矩阵表示的核心优势正在于此：**无论状态数多大，方程的形式始终不变**。
+三个状态时，$P$ 为 $3\times3$，$\mathbf{v}$ 和 $\mathbf{r}$ 为 $3\times1$，方程 $\mathbf{v} = \mathbf{r} + \gamma P\mathbf{v}$ 依然成立。矩阵表示的核心优势正在于此：**无论状态数多大，方程的形式始终不变**。
 
 ### $I - \gamma P$ 的可逆性条件
 
@@ -245,10 +245,10 @@ $$
 - **策略评估**：在策略迭代中反复应用贝尔曼更新。
 - **TD 学习**：利用采样数据进行增量更新。
 
-这些方法本质上都是通过更可扩展的方式逼近 $(I-\gamma P)^{-1}\boldsymbol{r}$ 这一解，而无需实际求逆。第 3 章中 DP、MC、TD 三代方法的演进，对应的正是"已知模型直接迭代 → 不知模型用采样 → 采样仅需一步"这条路径。
+这些方法本质上都是通过更可扩展的方式逼近 $(I-\gamma P)^{-1}\mathbf{r}$ 这一解，而无需实际求逆。第 3 章中 DP、MC、TD 三代方法的演进，对应的正是"已知模型直接迭代 → 不知模型用采样 → 采样仅需一步"这条路径。
 
 ::: warning 常见误区
-看到 $\boldsymbol{v} = (I-\gamma P)^{-1}\boldsymbol{r}$ 时，不应认为实际算法真的在计算矩阵逆。这个公式是理论的闭式解，用以说明解的存在性与唯一性。实际算法是迭代的。
+看到 $\mathbf{v} = (I-\gamma P)^{-1}\mathbf{r}$ 时，不应认为实际算法真的在计算矩阵逆。这个公式是理论的闭式解，用以说明解的存在性与唯一性。实际算法是迭代的。
 :::
 
 ---
@@ -262,7 +262,7 @@ $$
 把所有 $(s,a)$ 对的 Q 值排成一个长向量：
 
 $$
-\boldsymbol{q} =
+\mathbf{q} =
 \begin{bmatrix}
 Q(s_1, a_1) \\
 Q(s_1, a_2) \\
@@ -273,7 +273,7 @@ Q(s_2, a_1) \\
 \in \mathbb{R}^{|\mathcal{S}||\mathcal{A}|}.
 $$
 
-类似地，$\boldsymbol{r} \in \mathbb{R}^{|\mathcal{S}||\mathcal{A}|}$ 存放每个 $(s,a)$ 对的即时奖励。
+类似地，$\mathbf{r} \in \mathbb{R}^{|\mathcal{S}||\mathcal{A}|}$ 存放每个 $(s,a)$ 对的即时奖励。
 
 转移矩阵扩展为 $P \in \mathbb{R}^{|\mathcal{S}||\mathcal{A}| \times |\mathcal{S}|}$，每一行对应一个 $(s,a)$ 对，每一列对应一个下一状态 $s'$：
 
@@ -290,7 +290,7 @@ $$
 ### V-Q 关系
 
 $$
-\boldsymbol{v}_\pi = \Pi_\pi \boldsymbol{q}_\pi
+\mathbf{v}_\pi = \Pi_\pi \mathbf{q}_\pi
 $$
 
 验证第 $i$ 行：$\sum_a \pi(a|s_i) Q(s_i, a) = V(s_i)$。这正是 $V(s) = \sum_a \pi(a|s) Q(s,a)$ 的矩阵写法。
@@ -304,16 +304,16 @@ $$
 写成矩阵形式：
 
 $$
-\boldsymbol{q}_\pi = \boldsymbol{r} + \gamma P \boldsymbol{v}_\pi.
+\mathbf{q}_\pi = \mathbf{r} + \gamma P \mathbf{v}_\pi.
 $$
 
-将 $\boldsymbol{v}_\pi = \Pi_\pi \boldsymbol{q}_\pi$ 代入，得到纯 Q 的递推：
+将 $\mathbf{v}_\pi = \Pi_\pi \mathbf{q}_\pi$ 代入，得到纯 Q 的递推：
 
 $$
-\boldsymbol{q}_\pi = \boldsymbol{r} + \gamma P \Pi_\pi \boldsymbol{q}_\pi.
+\mathbf{q}_\pi = \mathbf{r} + \gamma P \Pi_\pi \mathbf{q}_\pi.
 $$
 
-闭式解为 $\boldsymbol{q}_\pi = (I - \gamma P \Pi_\pi)^{-1} \boldsymbol{r}$。
+闭式解为 $\mathbf{q}_\pi = (I - \gamma P \Pi_\pi)^{-1} \mathbf{r}$。
 
 ### Q 的贝尔曼最优方程
 
@@ -324,22 +324,22 @@ $$
 矩阵形式：
 
 $$
-\boldsymbol{q}_* = \boldsymbol{r} + \gamma P \cdot \mathrm{rowmax}(\boldsymbol{q}_*)
+\mathbf{q}_* = \mathbf{r} + \gamma P \cdot \mathrm{rowmax}(\mathbf{q}_*)
 $$
 
-其中 $\mathrm{rowmax}(\boldsymbol{q}) \in \mathbb{R}^{|\mathcal{S}|}$ 对每个状态取出该状态所有动作中的最大 Q 值。由于 max 不是线性运算，最优方程没有闭式解，只能通过迭代（如 Q-Learning）逼近。
+其中 $\mathrm{rowmax}(\mathbf{q}) \in \mathbb{R}^{|\mathcal{S}|}$ 对每个状态取出该状态所有动作中的最大 Q 值。由于 max 不是线性运算，最优方程没有闭式解，只能通过迭代（如 Q-Learning）逼近。
 
 ### 从 Q 的矩阵形式推出 V 的矩阵形式
 
-将 $\boldsymbol{v}_\pi = \Pi_\pi \boldsymbol{q}_\pi$ 代入 $\boldsymbol{q}_\pi = \boldsymbol{r} + \gamma P \boldsymbol{v}_\pi$，两边左乘 $\Pi_\pi$：
+将 $\mathbf{v}_\pi = \Pi_\pi \mathbf{q}_\pi$ 代入 $\mathbf{q}_\pi = \mathbf{r} + \gamma P \mathbf{v}_\pi$，两边左乘 $\Pi_\pi$：
 
 $$
-\Pi_\pi \boldsymbol{q}_\pi = \Pi_\pi \boldsymbol{r} + \gamma \Pi_\pi P \boldsymbol{v}_\pi
+\Pi_\pi \mathbf{q}_\pi = \Pi_\pi \mathbf{r} + \gamma \Pi_\pi P \mathbf{v}_\pi
 \quad\Longrightarrow\quad
-\boldsymbol{v}_\pi = \underbrace{\Pi_\pi \boldsymbol{r}}_{\boldsymbol{r}_\pi} + \gamma \underbrace{\Pi_\pi P}_{P_\pi} \boldsymbol{v}_\pi.
+\mathbf{v}_\pi = \underbrace{\Pi_\pi \mathbf{r}}_{\mathbf{r}_\pi} + \gamma \underbrace{\Pi_\pi P}_{P_\pi} \mathbf{v}_\pi.
 $$
 
-这就是前面推导过的 $\boldsymbol{v}_\pi = \boldsymbol{r}_\pi + \gamma P_\pi \boldsymbol{v}_\pi$。V 的矩阵形式中 $\boldsymbol{r}_\pi$ 和 $P_\pi$ 已经把策略平均融进去了，而 Q 的矩阵形式保留了动作维度——策略平均由 $\Pi_\pi$ 单独完成。这正是"$Q$ 比 $V$ 携带更细粒度信息"的矩阵语言表达。
+这就是前面推导过的 $\mathbf{v}_\pi = \mathbf{r}_\pi + \gamma P_\pi \mathbf{v}_\pi$。V 的矩阵形式中 $\mathbf{r}_\pi$ 和 $P_\pi$ 已经把策略平均融进去了，而 Q 的矩阵形式保留了动作维度——策略平均由 $\Pi_\pi$ 单独完成。这正是"$Q$ 比 $V$ 携带更细粒度信息"的矩阵语言表达。
 
 ---
 
@@ -354,12 +354,12 @@ $$
 矩阵形式就是把贝尔曼期望方程拆成迭代：
 
 $$
-\boldsymbol{v}_{k+1} = \boldsymbol{r}_\pi + \gamma P_\pi \boldsymbol{v}_k.
+\mathbf{v}_{k+1} = \mathbf{r}_\pi + \gamma P_\pi \mathbf{v}_k.
 $$
 
-每轮对所有状态同时做一次贝尔曼更新。前面用两状态例子演示过：从 $\boldsymbol{v}_0 = \boldsymbol{0}$ 开始，反复迭代会收敛到闭式解 $\boldsymbol{v} = (I - \gamma P_\pi)^{-1}\boldsymbol{r}_\pi$。
+每轮对所有状态同时做一次贝尔曼更新。前面用两状态例子演示过：从 $\mathbf{v}_0 = \mathbf{0}$ 开始，反复迭代会收敛到闭式解 $\mathbf{v} = (I - \gamma P_\pi)^{-1}\mathbf{r}_\pi$。
 
-策略改进 $\pi'(s) = \arg\max_a [R(s,a) + \gamma \sum_{s'} P(s'|s,a)V^\pi(s')]$ 在矩阵视角下等价于：对每个状态 $s$，比较 $\boldsymbol{r} + \gamma P\boldsymbol{v}_\pi$ 中属于该状态的那几行（每行对应一个动作），选出值最大的动作。
+策略改进 $\pi'(s) = \arg\max_a [R(s,a) + \gamma \sum_{s'} P(s'|s,a)V^\pi(s')]$ 在矩阵视角下等价于：对每个状态 $s$，比较 $\mathbf{r} + \gamma P\mathbf{v}_\pi$ 中属于该状态的那几行（每行对应一个动作），选出值最大的动作。
 
 ---
 
@@ -367,13 +367,13 @@ $$
 
 | 概念           | 逐状态形式（第 3 章）                                                                  | 矩阵形式                                                                              |
 | -------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| 贝尔曼期望方程 | $V^\pi(s)=\sum_a\pi(a\mid s)\left[R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V^\pi(s')\right]$ | $\boldsymbol{v}_\pi = \boldsymbol{r}_\pi + \gamma P_\pi \boldsymbol{v}_\pi$           |
-| 贝尔曼最优方程 | $V^*(s)=\max_a\left[R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V^*(s')\right]$                 | $\boldsymbol{v}_* = \boldsymbol{r}_* + \gamma P_* \boldsymbol{v}_*$（逐行取 max）     |
-| 闭式解         | —                                                                                      | $\boldsymbol{v} = (I - \gamma P)^{-1}\boldsymbol{r}$                                  |
-| V-Q 关系       | $V^\pi(s)=\sum_a\pi(a\mid s)Q^\pi(s,a)$                                                | $\boldsymbol{v}_\pi = \Pi_\pi \boldsymbol{q}_\pi$                                     |
-| Q 贝尔曼期望   | $Q^\pi(s,a)=R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)\sum_{a'}\pi(a'\mid s')Q^\pi(s',a')$    | $\boldsymbol{q}_\pi = \boldsymbol{r} + \gamma P \Pi_\pi \boldsymbol{q}_\pi$           |
-| Q 贝尔曼最优   | $Q^*(s,a)=R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)\max_{a'}Q^*(s',a')$                      | $\boldsymbol{q}_* = \boldsymbol{r} + \gamma P \cdot\mathrm{rowmax}(\boldsymbol{q}_*)$ |
-| DP 策略评估    | $V(s) \leftarrow \sum_a\pi(a\mid s)[R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V(s')]$         | $\boldsymbol{v}_{k+1} = \boldsymbol{r}_\pi + \gamma P_\pi \boldsymbol{v}_k$           |
+| 贝尔曼期望方程 | $V^\pi(s)=\sum_a\pi(a\mid s)\left[R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V^\pi(s')\right]$ | $\mathbf{v}_\pi = \mathbf{r}_\pi + \gamma P_\pi \mathbf{v}_\pi$           |
+| 贝尔曼最优方程 | $V^*(s)=\max_a\left[R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V^*(s')\right]$                 | $\mathbf{v}_* = \mathbf{r}_* + \gamma P_* \mathbf{v}_*$（逐行取 max）     |
+| 闭式解         | —                                                                                      | $\mathbf{v} = (I - \gamma P)^{-1}\mathbf{r}$                                  |
+| V-Q 关系       | $V^\pi(s)=\sum_a\pi(a\mid s)Q^\pi(s,a)$                                                | $\mathbf{v}_\pi = \Pi_\pi \mathbf{q}_\pi$                                     |
+| Q 贝尔曼期望   | $Q^\pi(s,a)=R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)\sum_{a'}\pi(a'\mid s')Q^\pi(s',a')$    | $\mathbf{q}_\pi = \mathbf{r} + \gamma P \Pi_\pi \mathbf{q}_\pi$           |
+| Q 贝尔曼最优   | $Q^*(s,a)=R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)\max_{a'}Q^*(s',a')$                      | $\mathbf{q}_* = \mathbf{r} + \gamma P \cdot\mathrm{rowmax}(\mathbf{q}_*)$ |
+| DP 策略评估    | $V(s) \leftarrow \sum_a\pi(a\mid s)[R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V(s')]$         | $\mathbf{v}_{k+1} = \mathbf{r}_\pi + \gamma P_\pi \mathbf{v}_k$           |
 
 MC 和 TD 方法基于采样更新单个状态，没有对应的矩阵形式。
 
@@ -381,7 +381,7 @@ MC 和 TD 方法基于采样更新单个状态，没有对应的矩阵形式。
 
 ## 矩阵形式的局限性
 
-本篇将贝尔曼方程压缩为矩阵形式 $\boldsymbol{v} = \boldsymbol{r} + \gamma P\boldsymbol{v}$，并给出了闭式解 $\boldsymbol{v} = (I-\gamma P)^{-1}\boldsymbol{r}$。无论状态数多少，方程始终是一行。
+本篇将贝尔曼方程压缩为矩阵形式 $\mathbf{v} = \mathbf{r} + \gamma P\mathbf{v}$，并给出了闭式解 $\mathbf{v} = (I-\gamma P)^{-1}\mathbf{r}$。无论状态数多少，方程始终是一行。
 
 但矩阵形式隐含了一个前提：**每个状态都有独立的 $v(s)$ 可以存储**。
 
