@@ -16,7 +16,7 @@
 | 策略梯度         | $\nabla J \approx G_t\nabla\log\pi_\theta(a_t\mid s_t)$                                | 好结果对应动作概率上升         |
 | 策略梯度定理     | $\nabla_\theta J=\sum_s d^\pi(s)\sum_a\nabla_\theta\pi_\theta(a\mid s)Q^\pi(s,a)$      | 参数变化如何影响平均回报       |
 | 对数导数技巧     | $\nabla_\theta\pi=\pi\nabla_\theta\log\pi$                                             | 把难算的概率梯度改成易采样形式 |
-| 优势加权更新     | $\nabla J \approx \hat{A}_t\nabla\log\pi_\theta(a_t\mid s_t)$                          | 相对平均更好的动作被加强       |
+| 优势加权更新     | $`\nabla J \approx \hat{A}_t\nabla\log\pi_\theta(a_t\mid s_t)`$                          | 相对平均更好的动作被加强       |
 | PPO 概率比       | $r_t=\frac{\pi_\theta(a_t\mid s_t)}{\pi_{old}(a_t\mid s_t)}$                           | 衡量新旧策略变化               |
 | 二阶 Taylor 展开 | $f(\theta+\Delta)\approx f(\theta)+\nabla f^\top\Delta+\frac{1}{2}\Delta^\top H\Delta$ | 理解曲率和信任域               |
 | PPO 裁剪项       | $\min(r_t\hat{A}_t,\mathrm{clip}(r_t,1-\epsilon,1+\epsilon)\hat{A}_t)$                 | 限制策略更新过大               |
